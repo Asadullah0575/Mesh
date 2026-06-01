@@ -1,4 +1,4 @@
-# Rialo
+# Mesh
 
 > **Find your founding team. Build something real.**
 
