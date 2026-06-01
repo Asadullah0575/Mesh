@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesh — Find Your Signal. Build Your Network.</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#080809;--bg2:#0f0f11;--bg3:#161619;--bg4:#1e1e22;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--border3:rgba(255,255,255,0.16);--white:#f4f2ee;--muted:#7a7870;--faint:#3a3835;--accent:#E8C547;--accent2:#D4B03A;--accent-dim:rgba(232,197,71,0.1);--teal:#36c9b0;--blue:#5b9cf6;--purple:#a78bfa;--red:#f05050;--r:4px;--r2:8px}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px)}
+  .hidden{display:none!important}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;background:rgba(8,8,9,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem}
+  .logo{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;letter-spacing:-0.01em;color:var(--white);display:flex;align-items:center;gap:10px;cursor:pointer}
+  .logo-mark{display:flex;align-items:center;justify-content:center;}
+  .logo-name span{color:var(--accent)}
+  .nav-pill{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--teal);background:rgba(54,201,176,0.08);border:1px solid rgba(54,201,176,0.18);border-radius:3px;padding:2px 7px}
+  .nav-right{display:flex;align-items:center;gap:8px}
+  .nav-email{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .btn-outline{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.04em;color:var(--muted);background:transparent;border:1px solid var(--border2);border-radius:var(--r);padding:6px 14px;cursor:pointer;transition:color .12s,border-color .12s}
+  .btn-outline:hover{color:var(--white);border-color:var(--border3)}
+  .btn-primary{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.04em;color:#0a0a0a;background:var(--accent);border:none;border-radius:var(--r);padding:6px 14px;cursor:pointer;transition:background .12s}
+  .btn-primary:hover{background:var(--accent2)}
+
+  /* BELL */
+  .bell-wrap{position:relative}
+  .bell-btn{width:34px;height:34px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;position:relative}
+  .bell-btn:hover{color:var(--white);border-color:var(--border3)}
+  .bell-badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;border:2px solid var(--bg)}
+  .bell-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:320px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+  .bell-header{padding:10px 14px;border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint)}
+  .invite-notif{padding:12px 14px;border-bottom:1px solid var(--border);transition:background .1s}
+  .invite-notif:last-child{border-bottom:none}
+  .invite-notif:hover{background:var(--bg3)}
+  .notif-name{font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px}
+  .notif-role{font-size:11px;color:var(--muted);margin-bottom:8px}
+  .notif-actions{display:flex;gap:6px}
+  .accept-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:4px 12px;border-radius:var(--r);border:none;background:var(--accent);color:#0a0a0a;cursor:pointer;transition:background .12s;letter-spacing:0.04em}
+  .accept-btn:hover{background:var(--accent2)}
+  .decline-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:4px 12px;border-radius:var(--r);border:1px solid rgba(240,80,80,0.3);background:rgba(240,80,80,0.08);color:#f08080;cursor:pointer;transition:all .12s;letter-spacing:0.04em}
+  .notif-status{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:3px 8px;border-radius:3px}
+  .notif-status.accepted{background:rgba(54,201,176,0.1);color:var(--teal)}
+  .notif-status.declined{background:rgba(255,255,255,0.05);color:var(--faint)}
+  .bell-empty{padding:2rem;text-align:center;color:var(--faint);font-size:12px}
+
+  /* PAGES */
+  .page{display:none}
+  .page.active{display:block}
+
+  /* HEADER */
+  .header{border-bottom:1px solid var(--border);padding:3rem 1.75rem 2rem;display:grid;grid-template-columns:1fr auto;align-items:end;gap:2rem;max-width:1300px;margin:0 auto}
+  .header-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .header-eyebrow::before{content:'';width:16px;height:1px;background:var(--faint)}
+  .header h1{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:clamp(1.9rem,3.5vw,2.8rem);line-height:1.08;letter-spacing:-0.03em;color:var(--white);margin-bottom:10px}
+  .header h1 mark{background:none;color:var(--accent)}
+  .header-sub{font-size:14px;color:var(--muted);max-width:460px;line-height:1.6}
+  .stats-cluster{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;flex-shrink:0}
+  .stat-cell{padding:14px 20px;border-right:1px solid var(--border);text-align:center;min-width:90px}
+  .stat-cell:last-child{border-right:none}
+  .stat-n{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:var(--accent);line-height:1;margin-bottom:3px}
+  .stat-l{font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--faint)}
+
+  /* LAYOUT */
+  .layout{max-width:1300px;margin:0 auto;padding:1.5rem 1.75rem 4rem;display:grid;grid-template-columns:220px 1fr;gap:1.5rem}
+  .sidebar{position:sticky;top:68px;height:fit-content}
+  .sb-section{border:1px solid var(--border);border-radius:var(--r2);padding:1rem;margin-bottom:1px;background:var(--bg2)}
+  .sb-section+.sb-section{border-top-left-radius:0;border-top-right-radius:0}
+  .sb-section:first-child{border-bottom-left-radius:0;border-bottom-right-radius:0}
+  .sb-section:not(:first-child):not(:last-child){border-radius:0}
+  .sb-section:last-child{border-top-left-radius:0;border-top-right-radius:0}
+  .sb-label{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+  .search-wrap{position:relative}
+  .search-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 10px 7px 30px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:12px;outline:none;transition:border-color .12s}
+  .search-input:focus{border-color:rgba(232,197,71,0.3)}
+  .search-input::placeholder{color:var(--faint)}
+  .search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--faint)}
+  .filter-list{display:flex;flex-direction:column;gap:2px}
+  .filter-item{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:var(--r);border:1px solid transparent;font-size:12px;color:var(--muted);background:transparent;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:all .1s;text-align:left}
+  .filter-item:hover{background:var(--bg3);color:var(--white)}
+  .filter-item.active{background:var(--accent-dim);border-color:rgba(232,197,71,0.15);color:var(--accent)}
+  .post-block{border:1px solid var(--border);border-radius:var(--r2);padding:1rem;background:var(--bg2);margin-top:1rem}
+  .post-block p{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+  .post-block button{width:100%;padding:8px;background:var(--accent);border:none;border-radius:var(--r);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.04em;color:#0a0a0a;cursor:pointer;transition:background .12s}
+  .post-block button:hover{background:var(--accent2)}
+
+  /* TOOLBAR */
+  .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+  .toolbar-left{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint)}
+  .toolbar-left strong{color:var(--muted)}
+  .sort-select{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--muted);padding:5px 10px;outline:none;cursor:pointer}
+
+  /* GRID */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+  .card{background:var(--bg2);padding:1.2rem;transition:background .12s;position:relative}
+  .card:hover{background:var(--bg3)}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .2s ease}
+  .card:hover::before{transform:scaleX(1)}
+  .card-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+  .avi{width:38px;height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;flex-shrink:0}
+  .card-info{flex:1;min-width:0}
+  .card-name{font-size:13px;font-weight:600;color:var(--white);letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
+  .card-role{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .online-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;box-shadow:0 0 5px var(--teal)}
+  .online-dot.off{background:var(--faint);box-shadow:none}
+  .card-bio{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+  .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;padding:2px 6px;border-radius:3px;letter-spacing:0.01em}
+  .tag-dev{background:rgba(91,156,246,0.1);color:#7ab0f8;border:1px solid rgba(91,156,246,0.15)}
+  .tag-sol{background:rgba(232,197,71,0.08);color:#D4B03A;border:1px solid rgba(232,197,71,0.12)}
+  .tag-design{background:rgba(167,139,250,0.1);color:#b89ffa;border:1px solid rgba(167,139,250,0.15)}
+  .tag-biz{background:rgba(54,201,176,0.1);color:#4ed4ba;border:1px solid rgba(54,201,176,0.15)}
+  .tag-ai{background:rgba(240,80,80,0.1);color:#f08080;border:1px solid rgba(240,80,80,0.15)}
+  .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
+  .card-meta-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .meta-chip{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;text-transform:uppercase;padding:2px 6px;border-radius:3px;border:1px solid var(--border);color:var(--faint)}
+  .track-chip{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px}
+  .need-row{font-size:10px;color:var(--faint);margin-bottom:10px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+  .need-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:1px 5px;border-radius:3px;border:1px solid var(--border);color:var(--muted);background:var(--bg3)}
+  .card-actions{display:flex;gap:5px}
+  .invite-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;padding:4px 10px;border-radius:var(--r);border:1px solid rgba(232,197,71,0.25);background:var(--accent-dim);color:var(--accent);cursor:pointer;text-transform:uppercase;transition:all .12s}
+  .invite-btn:hover{background:rgba(232,197,71,0.16)}
+  .invite-btn.sent{color:var(--teal);background:rgba(54,201,176,0.08);border-color:rgba(54,201,176,0.2);cursor:default}
+  .invite-btn:disabled{opacity:.4;cursor:default}
+  .msg-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;padding:4px 10px;border-radius:var(--r);border:1px solid rgba(91,156,246,0.25);background:rgba(91,156,246,0.08);color:#7ab0f8;cursor:pointer;text-transform:uppercase;transition:all .12s}
+  .msg-btn:hover{background:rgba(91,156,246,0.14)}
+  .edit-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;padding:4px 10px;border-radius:var(--r);border:1px solid rgba(232,197,71,0.25);background:var(--accent-dim);color:var(--accent);cursor:pointer;text-transform:uppercase;transition:all .12s}
+  .del-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;padding:4px 10px;border-radius:var(--r);border:1px solid rgba(240,80,80,0.25);background:rgba(240,80,80,0.08);color:#f08080;cursor:pointer;text-transform:uppercase;transition:all .12s}
+
+  /* AVATAR */
+  .avatar-upload{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .avatar-preview{width:64px;height:64px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600}
+  .avatar-preview img{width:100%;height:100%;object-fit:cover}
+  .avatar-upload-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;padding:6px 12px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--muted);cursor:pointer;transition:all .12s}
+  .avatar-upload-btn:hover{color:var(--white);border-color:var(--border3)}
+  .avatar-hint{font-size:11px;color:var(--faint)}
+  .social-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .social-input-wrap{position:relative}
+  .social-prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace;pointer-events:none}
+  .social-input{padding-left:28px!important}
+  /* CARD AVATAR */
+  .card-avi-img{width:38px;height:38px;border-radius:6px;object-fit:cover;flex-shrink:0}
+  /* SOCIAL ICONS on card */
+  .social-links{display:flex;gap:6px;margin-top:6px}
+  .social-link{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--faint);text-decoration:none;transition:all .12s}
+  .social-link:hover{border-color:var(--border2);color:var(--white)}
+
+  /* SKELETON */
+  .skeleton{background:var(--bg2);padding:1.2rem}
+  .skel-line{height:12px;border-radius:3px;background:var(--bg3);margin-bottom:8px;animation:shimmer 1.4s infinite}
+  @keyframes shimmer{0%,100%{opacity:.4}50%{opacity:.8}}
+
+  /* TEAMS PAGE */
+  .teams-page{max-width:1300px;margin:0 auto;padding:1.5rem 1.75rem 4rem}
+  .page-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+  .page-nav-title{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--white)}
+  .back-link{font-size:12px;color:var(--muted);cursor:pointer;font-family:'IBM Plex Mono',monospace}
+  .back-link:hover{color:var(--white)}
+
+  /* SIDEBAR TABS */
+  .sidebar-tabs{display:flex;border-bottom:1px solid var(--border)}
+  .sidebar-tab{flex:1;padding:9px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint);background:transparent;border:none;cursor:pointer;transition:all .12s;border-bottom:2px solid transparent}
+  .sidebar-tab:hover{color:var(--muted)}
+  .sidebar-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* CREATE GROUP BTN */
+  .create-group-btn{width:calc(100% - 2rem);margin:0.75rem 1rem;padding:7px;background:transparent;border:1px dashed rgba(232,197,71,0.2);border-radius:var(--r);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(232,197,71,0.5);cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:6px}
+  .create-group-btn:hover{border-color:rgba(232,197,71,0.4);color:var(--accent)}
+
+  /* GROUP ITEM */
+  .group-item{padding:10px 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:10px}
+  .group-item:hover{background:var(--bg3)}
+  .group-item.active{background:var(--bg3);border-left:2px solid var(--accent)}
+  .group-icon{width:32px;height:32px;border-radius:5px;background:rgba(232,197,71,0.08);border:1px solid rgba(232,197,71,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:var(--accent)}
+  .group-info{flex:1;min-width:0}
+  .group-name{font-size:12px;font-weight:600;color:var(--white);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .group-meta{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* GROUP MEMBERS ROW */
+  .members-row{display:flex;align-items:center;gap:6px;padding:8px 1rem;border-bottom:1px solid var(--border);background:var(--bg3);flex-wrap:wrap}
+  .member-chip{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;padding:3px 8px;border-radius:100px;border:1px solid var(--border);background:var(--bg2)}
+  .member-chip-avi{width:16px;height:16px;border-radius:3px;object-fit:cover}
+  .add-member-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(232,197,71,0.2);border-radius:100px;padding:3px 10px;cursor:pointer;transition:all .12s;white-space:nowrap}
+  .add-member-btn:hover{background:rgba(232,197,71,0.16)}
+
+  /* DATE DIVIDER */
+  .date-divider{display:flex;align-items:center;gap:10px;margin:16px 0 8px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint)}
+  .date-divider::before,.date-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  /* MSG CONTEXT MENU */
+  .msg-row{display:flex;flex-direction:column;margin-bottom:4px;position:relative;padding:0 2px;cursor:pointer}
+  .msg-context-menu{position:fixed;z-index:500;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.5);animation:pop .12s ease}
+  .msg-context-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.03em;cursor:pointer;transition:background .1s;color:var(--muted)}
+  .msg-context-item:hover{background:var(--bg3);color:var(--white)}
+  .msg-context-item.danger{color:#f08080}
+  .msg-context-item.danger:hover{background:rgba(240,80,80,0.08);color:#f08080}
+  .msg-edit-input{width:100%;background:var(--bg3);border:1px solid rgba(232,197,71,0.3);border-radius:6px;padding:7px 10px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:13px;outline:none;margin-top:4px}
+  .msg-edit-actions{display:flex;gap:6px;margin-top:6px}
+  .msg-edit-save{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:5px 12px;background:var(--accent);border:none;border-radius:4px;color:#0a0a0a;cursor:pointer}
+  .msg-edit-cancel{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 12px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer}
+
+  /* MSG GROUPS - consecutive messages from same sender */
+  .msg-group{display:flex;flex-direction:column;gap:2px;margin-bottom:10px}
+  .msg-group.mine{align-items:flex-end}
+  .msg-group.theirs{align-items:flex-start}
+
+  /* SENDER ROW */
+  .msg-sender-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .msg-sender-avi{width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0}
+  .msg-sender-name{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.02em}
+
+  /* BUBBLE */
+  .msg-bubble{max-width:62%;padding:9px 13px;border-radius:10px;font-size:13px;line-height:1.6;word-break:break-word;position:relative}
+  .msg-bubble.mine{background:var(--accent-dim);border:1px solid rgba(232,197,71,0.18);color:var(--white);border-bottom-right-radius:3px}
+  .msg-bubble.theirs{background:var(--bg3);border:1px solid var(--border);color:var(--white);border-bottom-left-radius:3px}
+  .msg-bubble.deleted{background:transparent;border-color:var(--border);padding:6px 10px}
+  .msg-deleted{font-style:italic;color:var(--faint);font-size:12px}
+
+  /* META */
+  .msg-meta{font-size:10px;color:var(--faint);font-family:'IBM Plex Mono',monospace;margin-top:3px;padding:0 2px}
+  .msg-meta.mine{text-align:right;align-self:flex-end}
+  .msg-meta.theirs{text-align:left;align-self:flex-start}
+
+  /* IMAGE / FILE */
+  .msg-image{max-width:240px;max-height:240px;border-radius:8px;cursor:zoom-in;display:block;border:1px solid var(--border);object-fit:cover;transition:opacity .12s}
+  .msg-image:hover{opacity:.9}
+  /* LIGHTBOX */
+  .lightbox{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;cursor:zoom-out;animation:fadeIn .15s ease}
+  .lightbox img{max-width:90vw;max-height:88vh;border-radius:8px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.6)}
+  .lightbox-close{position:fixed;top:1.25rem;right:1.25rem;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .12s}
+  .lightbox-close:hover{background:rgba(255,255,255,0.2)}
+  .msg-caption{font-size:11px;color:var(--muted);margin-top:4px;font-style:italic}
+  .msg-file{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;font-size:12px;color:var(--white);text-decoration:none;transition:border-color .12s;min-width:160px}
+  .msg-file:hover{border-color:var(--accent);color:var(--accent)}
+  .msg-file-icon{width:28px;height:28px;border-radius:5px;background:rgba(232,197,71,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent)}
+  .msg-file-info{flex:1;min-width:0}
+  .msg-file-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+  .msg-file-label{font-size:10px;color:var(--faint);font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;margin-top:1px}
+
+  /* FILE UPLOAD BTN */
+  .attach-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
+  .attach-btn:hover{color:var(--white);border-color:var(--border2)}
+
+  /* TEAM CHAT */
+  .team-layout{display:grid;grid-template-columns:240px 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;min-height:640px}
+  .team-list{background:var(--bg2);overflow-y:auto}
+  .team-list-header{padding:1rem;border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--faint)}
+  .team-item{padding:12px 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:10px}
+  .team-item:hover{background:var(--bg3)}
+  .team-item.active{background:var(--bg3);border-left:2px solid var(--accent)}
+  .team-item-info{flex:1;min-width:0}
+  .team-item-name{font-size:12px;font-weight:600;color:var(--white);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .team-item-role{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .team-unread{background:var(--red);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0}
+
+  /* CHAT PANEL */
+  .chat-panel{background:var(--bg2);display:flex;flex-direction:column}
+  .chat-header{padding:1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .chat-partner-name{font-size:13px;font-weight:600;color:var(--white)}
+  .chat-partner-role{font-size:11px;color:var(--muted)}
+
+  /* TABS */
+  .chat-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg3)}
+  .chat-tab{flex:1;padding:9px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--faint);background:transparent;border:none;cursor:pointer;transition:all .12s;border-bottom:2px solid transparent}
+  .chat-tab:hover{color:var(--muted)}
+  .chat-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* MESSAGES TAB */
+  .tab-content{display:none;flex:1;flex-direction:column}
+  .tab-content.active{display:flex}
+  .chat-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0;max-height:400px}
+  .chat-empty{display:flex;align-items:center;justify-content:center;height:200px;color:var(--faint);font-size:12px;font-family:'IBM Plex Mono',monospace}
+  .chat-input-row{padding:1rem;border-top:1px solid var(--border);display:flex;gap:8px}
+  .chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:13px;outline:none;transition:border-color .12s;resize:none;max-height:100px}
+  .chat-input:focus{border-color:rgba(232,197,71,0.3)}
+  .chat-input::placeholder{color:var(--faint)}
+  .send-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:9px 14px;background:var(--accent);border:none;border-radius:var(--r);color:#0a0a0a;cursor:pointer;transition:background .12s;align-self:flex-end;white-space:nowrap}
+  .send-btn:hover{background:var(--accent2)}
+  .send-btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* DRAFT TAB */
+  .draft-area{flex:1;display:flex;flex-direction:column;padding:1rem;gap:10px}
+  .draft-header{display:flex;align-items:center;justify-content:space-between}
+  .draft-title{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--faint)}
+  .draft-status{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--faint)}
+  .draft-textarea{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:13px;line-height:1.7;outline:none;resize:none;transition:border-color .12s;min-height:360px}
+  .draft-textarea:focus{border-color:rgba(232,197,71,0.3)}
+  .draft-textarea::placeholder{color:var(--faint)}
+  .draft-hint{font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace}
+
+  /* NO TEAM SELECTED */
+  .no-team{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;color:var(--faint);font-size:12px;font-family:'IBM Plex Mono',monospace}
+
+  /* MODALS */
+  .overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:1.5rem}
+  .overlay.open{display:flex}
+  .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:1.75rem;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;animation:pop .18s ease}
+  @keyframes pop{from{transform:scale(0.97) translateY(8px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .modal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem}
+  .modal-title{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:16px;color:var(--white);margin-bottom:2px}
+  .modal-sub{font-size:12px;color:var(--muted)}
+  .close-btn{width:28px;height:28px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;flex-shrink:0}
+  .close-btn:hover{color:var(--white);border-color:var(--border2)}
+  .divider{height:1px;background:var(--border);margin:1.25rem 0}
+  .field{margin-bottom:14px}
+  .field-label{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+  .field-label .req{color:var(--accent)}
+  .f-input,.f-select,.f-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:13px;outline:none;transition:border-color .12s}
+  .f-input:focus,.f-select:focus,.f-textarea:focus{border-color:rgba(232,197,71,0.35);background:var(--bg4)}
+  .f-input::placeholder,.f-textarea::placeholder{color:var(--faint)}
+  .f-textarea{min-height:72px;resize:vertical}
+  .f-select option{background:var(--bg3)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pick-grid{display:flex;flex-wrap:wrap;gap:5px}
+  .pick-btn{font-family:'IBM Plex Sans',sans-serif;font-size:11px;padding:4px 9px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .1s}
+  .pick-btn:hover{border-color:var(--border2);color:var(--white)}
+  .pick-btn.on{background:var(--accent-dim);border-color:rgba(232,197,71,0.25);color:var(--accent)}
+  .modal-footer{display:flex;gap:8px;margin-top:1.25rem}
+  .btn-cancel{flex:1;padding:9px;background:transparent;border:1px solid var(--border);border-radius:var(--r);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;transition:all .1s}
+  .btn-cancel:hover{border-color:var(--border2);color:var(--white)}
+  .btn-go{flex:2;padding:9px;background:var(--accent);border:none;border-radius:var(--r);color:#0a0a0a;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.04em;cursor:pointer;transition:background .1s}
+  .btn-go:hover{background:var(--accent2)}
+  .btn-go:disabled,.btn-cancel:disabled{opacity:.5;cursor:not-allowed}
+  .form-error{font-size:11px;color:#f08080;margin-top:6px;font-family:'IBM Plex Mono',monospace}
+  .form-ok{font-size:11px;color:var(--teal);margin-top:6px;font-family:'IBM Plex Mono',monospace}
+  .text-link{font-size:11px;color:var(--muted);cursor:pointer;font-family:'IBM Plex Mono',monospace;text-decoration:underline;background:none;border:none;padding:0}
+  .text-link:hover{color:var(--white)}
+
+  /* EMPTY / TOAST */
+  .empty{padding:4rem 2rem;text-align:center;color:var(--faint);grid-column:1/-1;background:var(--bg2);font-size:12px}
+  .toast{position:fixed;bottom:1.25rem;right:1.25rem;z-index:300;background:var(--bg3);border:1px solid rgba(54,201,176,0.25);border-radius:var(--r);padding:9px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);opacity:0;transform:translateY(8px);transition:all .18s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.err{border-color:rgba(240,80,80,0.3);color:#f08080}
+
+  @media(max-width:740px){.layout{grid-template-columns:1fr}.sidebar{position:static}.header{grid-template-columns:1fr}.stats-cluster{display:none}.team-layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-mark">
+      <img src="logo.png" width="22" height="22" style="object-fit:contain;" alt="Rialo logo">
+    </div>
+    <span class="logo-name">MES<span>H</span></span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-email hidden" id="userEmail"></span>
+
+    <!-- BELL -->
+    <div class="bell-wrap hidden" id="bellWrap">
+      <button class="bell-btn" id="bellBtn" onclick="toggleBell()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="bell-badge hidden" id="bellBadge">0</span>
+      </button>
+      <div class="bell-dropdown hidden" id="bellDropdown">
+        <div class="bell-header">Invites</div>
+        <div id="bellList"><div class="bell-empty">No invites yet</div></div>
+      </div>
+    </div>
+
+    <!-- TEAMS BTN -->
+    <button class="btn-outline hidden" id="teamsBtn" onclick="showPage('teams')">MY TEAMS</button>
+    <a href="/admin.html" class="btn-outline hidden" id="adminBtn" style="color:#f08080;border-color:rgba(240,80,80,0.25);text-decoration:none">ADMIN</a>
+
+    <button class="btn-outline" id="signinBtn" onclick="openAuthModal('signin')">Sign in</button>
+    <button class="btn-outline hidden" id="signoutBtn" onclick="handleSignOut()">Sign out</button>
+    <button class="btn-primary hidden" id="postBtn" onclick="openPostModal()">+ Post Profile</button>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div class="page active" id="homePage">
+  <div class="header">
+    <div>
+      <div class="header-eyebrow">Team matching platform</div>
+      <h1>Find your <mark>founding team.</mark><br>Build something real.</h1>
+      <p class="header-sub">Connect with builders, designers, and operators across every timezone. Post your profile. Form your squad.</p>
+    </div>
+    <div class="stats-cluster">
+      <div class="stat-cell"><div class="stat-n" id="sBuilders">—</div><div class="stat-l">Builders</div></div>
+      <div class="stat-cell"><div class="stat-n" id="sCountries">—</div><div class="stat-l">Countries</div></div>
+      <div class="stat-cell"><div class="stat-n">6</div><div class="stat-l">Tracks</div></div>
+    </div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sb-section">
+        <div class="sb-label">Search</div>
+        <div class="search-wrap">
+          <svg class="search-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" id="searchInput" type="text" placeholder="Name, skill, role..." oninput="render()">
+        </div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">Track</div>
+        <div class="filter-list" id="trackList">
+          <button class="filter-item active" onclick="setF('track','all',this)">All tracks</button>
+          <button class="filter-item" onclick="setF('track','DeFi',this)">DeFi</button>
+          <button class="filter-item" onclick="setF('track','Infrastructure',this)">Infrastructure</button>
+          <button class="filter-item" onclick="setF('track','Consumer',this)">Consumer</button>
+          <button class="filter-item" onclick="setF('track','AI',this)">AI / Agents</button>
+          <button class="filter-item" onclick="setF('track','Gaming',this)">Gaming</button>
+          <button class="filter-item" onclick="setF('track','Privacy',this)">Privacy</button>
+          <button class="filter-item" onclick="setF('track','Others',this)">Others</button>
+        </div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">Role needed</div>
+        <div class="filter-list" id="roleList">
+          <button class="filter-item active" onclick="setF('role','all',this)">Any role</button>
+          <button class="filter-item" onclick="setF('role','Developer',this)">Developer</button>
+          <button class="filter-item" onclick="setF('role','Designer',this)">Designer</button>
+          <button class="filter-item" onclick="setF('role','Business',this)">Business</button>
+          <button class="filter-item" onclick="setF('role','AI/ML',this)">AI / ML</button>
+          <button class="filter-item" onclick="setF('role','Others',this)">Others</button>
+        </div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">Timezone</div>
+        <div class="filter-list" id="tzList">
+          <button class="filter-item active" onclick="setF('tz','all',this)">Worldwide</button>
+          <button class="filter-item" onclick="setF('tz','Americas',this)">Americas</button>
+          <button class="filter-item" onclick="setF('tz','Europe / Africa',this)">Europe / Africa</button>
+          <button class="filter-item" onclick="setF('tz','Asia / Pacific',this)">Asia / Pacific</button>
+        </div>
+      </div>
+      <div class="post-block">
+        <p>Looking for a team? Post your profile and let builders find you.</p>
+        <button onclick="currentUser ? openPostModal() : openAuthModal('signin')">POST YOUR PROFILE →</button>
+      </div>
+    </aside>
+    <div>
+      <div class="toolbar">
+        <div class="toolbar-left">Showing <strong id="countLabel">— builders</strong></div>
+        <select class="sort-select" id="sortSel" onchange="render()">
+          <option value="recent">RECENT</option>
+          <option value="active">ACTIVE FIRST</option>
+          <option value="az">A → Z</option>
+        </select>
+      </div>
+      <div class="grid" id="grid">
+        <div class="skeleton"><div class="skel-line" style="width:60%"></div><div class="skel-line" style="width:40%"></div><div class="skel-line" style="width:80%;margin-top:12px"></div></div>
+        <div class="skeleton"><div class="skel-line" style="width:50%"></div><div class="skel-line" style="width:35%"></div><div class="skel-line" style="width:75%;margin-top:12px"></div></div>
+        <div class="skeleton"><div class="skel-line" style="width:65%"></div><div class="skel-line" style="width:45%"></div><div class="skel-line" style="width:70%;margin-top:12px"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TEAMS PAGE -->
+<div class="page" id="teamsPage">
+  <div class="teams-page">
+    <div class="page-nav">
+      <span class="back-link" onclick="showPage('home')">← back to builders</span>
+      <span class="page-nav-title">MY TEAMS</span>
+      <div style="width:120px"></div>
+    </div>
+    <div class="team-layout">
+      <div class="team-list">
+        <!-- SIDEBAR TABS -->
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab active" id="tabDirect" onclick="switchSidebarTab('direct')">DIRECT</button>
+          <button class="sidebar-tab" id="tabGroups" onclick="switchSidebarTab('groups')">GROUPS</button>
+        </div>
+        <!-- DIRECT LIST -->
+        <div id="directList">
+          <div style="padding:2rem;text-align:center;color:var(--faint);font-size:12px">No teams yet</div>
+        </div>
+        <!-- GROUPS LIST -->
+        <div id="groupsList" style="display:none">
+          <button class="create-group-btn" onclick="openCreateGroupModal()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            NEW GROUP
+          </button>
+          <div id="groupListItems"><div style="padding:1.5rem;text-align:center;color:var(--faint);font-size:12px">No groups yet</div></div>
+        </div>
+      </div>
+
+      <!-- CHAT PANEL -->
+      <div class="chat-panel" id="chatPanel">
+        <div class="no-team" id="noTeamMsg">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <p>Select a chat to start messaging</p>
+        </div>
+        <div id="chatContent" class="hidden" style="flex:1;flex-direction:column;height:100%">
+          <div class="chat-header" id="chatHeader"></div>
+          <!-- members row for groups -->
+          <div id="membersRow" class="hidden"></div>
+          <div class="chat-tabs">
+            <button class="chat-tab active" id="tabMessages" onclick="switchTab('messages')">MESSAGES</button>
+            <button class="chat-tab" id="tabDraft" onclick="switchTab('draft')">SHARED DRAFT</button>
+          </div>
+          <!-- MESSAGES TAB -->
+          <div class="tab-content active" id="messagesTab">
+            <div class="chat-messages" id="chatMsgs"><div class="chat-empty">Loading...</div></div>
+            <div id="filePreviewBar" style="display:none;padding:6px 1rem;border-top:1px solid var(--border);background:var(--bg3);display:none;align-items:center;gap:8px">
+              <img id="filePreviewImg" style="height:40px;border-radius:4px;display:none">
+              <span id="filePreviewName" style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+              <button onclick="clearFileAttachment()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">✕</button>
+            </div>
+            <div class="chat-input-row">
+              <input type="file" id="groupFileInput" accept="image/*,.pdf,.doc,.docx,.txt,.zip" style="display:none" onchange="handleGroupFileSelect(this)">
+              <button class="attach-btn" id="attachBtn" style="display:none" title="Attach file" onclick="document.getElementById('groupFileInput').click()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              </button>
+              <textarea class="chat-input" id="chatInput" rows="1" placeholder="Type a message... (Enter to send)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();window.sendMsg()}"></textarea>
+              <button class="send-btn" id="sendBtn" onclick="event.preventDefault();window.sendMsg()">SEND →</button>
+            </div>
+          </div>
+          <!-- DRAFT TAB -->
+          <div class="tab-content" id="draftTab">
+            <div class="draft-area">
+              <div class="draft-header">
+                <span class="draft-title">Shared Notes & Draft</span>
+                <span class="draft-status" id="draftStatus">—</span>
+              </div>
+              <textarea class="draft-textarea" id="draftContent" placeholder="Start writing shared notes, ideas, links, plans..."></textarea>
+              <span class="draft-hint">Auto-saves every 5 seconds · Visible to all team members</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="authOverlay">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head">
+      <div><div class="modal-title" id="authTitle">Sign in</div><div class="modal-sub" id="authSub">Welcome back to Mesh</div></div>
+      <button class="close-btn" onclick="closeAuthModal()">✕</button>
+    </div>
+    <div id="authForm">
+      <div class="field"><div class="field-label">Email <span class="req">*</span></div><input class="f-input" id="authEmail" type="email" placeholder="you@example.com"></div>
+      <div class="field" id="authPwField"><div class="field-label">Password <span class="req">*</span></div><input class="f-input" id="authPassword" type="password" placeholder="••••••••"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:8px">
+        <button class="text-link hidden" id="forgotLink" onclick="showForgot()">Forgot password?</button>
+      </div>
+    </div>
+    <div class="form-error hidden" id="authError"></div>
+    <div class="form-ok hidden" id="authOk"></div>
+    <div class="modal-footer" id="authFooter">
+      <button class="btn-cancel" id="authToggleBtn" onclick="toggleAuthMode()">Create account</button>
+      <button class="btn-go" id="authSubmitBtn" onclick="handleAuth()">SIGN IN →</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST MODAL -->
+<div class="overlay" id="postOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div><div class="modal-title">Post your profile</div><div class="modal-sub">Let other builders find you</div></div>
+      <button class="close-btn" onclick="closePostModal()">✕</button>
+    </div>
+    <div class="row2">
+      <div class="field"><div class="field-label">Name <span class="req">*</span></div><input class="f-input" id="pName" type="text" placeholder="Your full name"></div>
+      <div class="field"><div class="field-label">Role <span class="req">*</span></div><input class="f-input" id="pRole" type="text" placeholder="e.g. Rust Developer"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><div class="field-label">Track <span class="req">*</span></div>
+        <select class="f-select" id="pTrack"><option value="">Select...</option><option>DeFi</option><option>Infrastructure</option><option>Consumer</option><option>AI</option><option>Gaming</option><option>Privacy</option></select>
+      </div>
+      <div class="field"><div class="field-label">Timezone <span class="req">*</span></div>
+        <select class="f-select" id="pTz"><option value="">Select...</option><option>Americas</option><option>Europe / Africa</option><option>Asia / Pacific</option></select>
+      </div>
+    </div>
+    <div class="field"><div class="field-label">Bio <span class="req">*</span></div><textarea class="f-textarea" id="pBio" placeholder="What are you building? What's your background?"></textarea></div>
+    <div class="divider"></div>
+    <!-- AVATAR UPLOAD -->
+    <div class="field">
+      <div class="field-label">Profile Photo</div>
+      <div class="avatar-upload">
+        <div class="avatar-preview" id="pAvatarPreview"><span id="pAvatarInitials">?</span></div>
+        <div>
+          <input type="file" id="pAvatarInput" accept="image/*" style="display:none" onchange="handleAvatarChange('p',this)">
+          <button class="avatar-upload-btn" onclick="document.getElementById('pAvatarInput').click()">Upload photo</button>
+          <div class="avatar-hint" style="margin-top:4px">JPG or PNG, max 750KB</div>
+        </div>
+      </div>
+    </div>
+    <!-- SOCIAL LINKS -->
+    <div class="field">
+      <div class="field-label">Social Links</div>
+      <div class="social-row">
+        <div class="social-input-wrap">
+          <span class="social-prefix">gh/</span>
+          <input class="f-input social-input" id="pGithub" type="text" placeholder="username">
+        </div>
+        <div class="social-input-wrap">
+          <span class="social-prefix">@</span>
+          <input class="f-input social-input" id="pTwitter" type="text" placeholder="username">
+        </div>
+      </div>
+      <input class="f-input" id="pWebsite" type="text" placeholder="https://yoursite.com" style="margin-top:8px">
+    </div>
+    <div class="divider"></div>
+    <div class="field"><div class="field-label">Your skills</div>
+      <div class="pick-grid" id="skillPicker">
+        <button class="pick-btn" onclick="tog(this,'Developer')">Developer</button><button class="pick-btn"
+          onclick="tog(this,'Designer')">Designer</button><button class="pick-btn"
+          onclick="tog(this,'Smart Contract Engineer')">Smart Contract Engineer</button><button class="pick-btn"
+          onclick="tog(this,'Full Stack Engineer')">Full Stack Engineer</button><button class="pick-btn"
+          onclick="tog(this,'Mobile Developer')">Mobile Developer</button><button class="pick-btn"
+          onclick="tog(this,'Protocol Researcher')">Protocol Researcher</button><button class="pick-btn"
+          onclick="tog(this,'AI / ML Engineer')">AI / ML Engineer</button><button class="pick-btn"
+          onclick="tog(this,'Business')">Business</button><button class="pick-btn"
+          onclick="tog(this,'Frontend')">Frontend</button><button class="pick-btn"
+          onclick="tog(this,'Backend')">Backend</button><button class="pick-btn"
+          onclick="tog(this,'DevOps')">DevOps</button><button class="pick-btn" onclick="tog(this,'DeFi Protocol')">DeFi
+          Protocol</button><button class="pick-btn" onclick="tog(this,'UI/UX')">UI/UX</button><button class="pick-btn"
+          onclick="tog(this,'Others')">Others</button>
+        <button class="pick-btn" onclick="tog(this,'Others')">Others</button>
+      </div>
+    </div>
+    <div class="field" style="margin-top:12px"><div class="field-label">Looking for</div>
+      <div class="pick-grid" id="lookPicker">
+        <button class="pick-btn" onclick="togL(this,'Developer')">Developer</button><button class="pick-btn" onclick="togL(this,'Designer')">Designer</button><button class="pick-btn" onclick="togL(this,'Smart Contract Engineer')">Smart Contract Engineer</button><button class="pick-btn" onclick="togL(this,'Full Stack Engineer')">Full Stack Engineer</button><button class="pick-btn" onclick="togL(this,'Mobile Developer')">Mobile Developer</button><button class="pick-btn" onclick="togL(this,'Protocol Researcher')">Protocol Researcher</button><button class="pick-btn" onclick="togL(this,'AI / ML Engineer')">AI / ML Engineer</button><button class="pick-btn" onclick="togL(this,'Business')">Business</button><button class="pick-btn" onclick="togL(this,'Frontend')">Frontend</button><button class="pick-btn" onclick="togL(this,'Backend')">Backend</button><button class="pick-btn" onclick="togL(this,'DevOps')">DevOps</button><button class="pick-btn" onclick="togL(this,'DeFi Protocol')">DeFi Protocol</button><button class="pick-btn" onclick="togL(this,'UI/UX')">UI/UX</button><button class="pick-btn" onclick="togL(this,'Others')">Others</button>
+        <button class="pick-btn" onclick="togL(this,'Others')">Others</button>
+      </div>
+    </div>
+    <div class="form-error hidden" id="postError"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closePostModal()">CANCEL</button>
+      <button class="btn-go" id="postSubmitBtn" onclick="submitProfile()">POST TO MESH →</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div><div class="modal-title">Edit your profile</div><div class="modal-sub">Update your info</div></div>
+      <button class="close-btn" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="row2">
+      <div class="field"><div class="field-label">Name <span class="req">*</span></div><input class="f-input" id="eName" type="text"></div>
+      <div class="field"><div class="field-label">Role <span class="req">*</span></div><input class="f-input" id="eRole" type="text"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><div class="field-label">Track <span class="req">*</span></div>
+        <select class="f-select" id="eTrack"><option value="">Select...</option><option>DeFi</option><option>Infrastructure</option><option>Consumer</option><option>AI</option><option>Gaming</option><option>Privacy</option></select>
+      </div>
+      <div class="field"><div class="field-label">Timezone <span class="req">*</span></div>
+        <select class="f-select" id="eTz"><option value="">Select...</option><option>Americas</option><option>Europe / Africa</option><option>Asia / Pacific</option></select>
+      </div>
+    </div>
+    <div class="field"><div class="field-label">Bio <span class="req">*</span></div><textarea class="f-textarea" id="eBio"></textarea></div>
+    <div class="divider"></div>
+    <div class="field">
+      <div class="field-label">Profile Photo</div>
+      <div class="avatar-upload">
+        <div class="avatar-preview" id="eAvatarPreview"><span id="eAvatarInitials">?</span></div>
+        <div>
+          <input type="file" id="eAvatarInput" accept="image/*" style="display:none" onchange="handleAvatarChange('e',this)">
+          <button class="avatar-upload-btn" onclick="document.getElementById('eAvatarInput').click()">Change photo</button>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Social Links</div>
+      <div class="social-row">
+        <div class="social-input-wrap">
+          <span class="social-prefix">gh/</span>
+          <input class="f-input social-input" id="eGithub" type="text" placeholder="username">
+        </div>
+        <div class="social-input-wrap">
+          <span class="social-prefix">@</span>
+          <input class="f-input social-input" id="eTwitter" type="text" placeholder="username">
+        </div>
+      </div>
+      <input class="f-input" id="eWebsite" type="text" placeholder="https://yoursite.com" style="margin-top:8px">
+    </div>
+    <div class="divider"></div>
+    <div class="field"><div class="field-label">Skills</div>
+      <div class="pick-grid" id="editSkillPicker">
+        <button class="pick-btn" onclick="togE(this,'Rust')">Rust</button><button class="pick-btn" onclick="togE(this,'TypeScript')">TypeScript</button><button class="pick-btn" onclick="togE(this,'React')">React</button><button class="pick-btn" onclick="togE(this,'Solana')">Solana</button><button class="pick-btn" onclick="togE(this,'Smart Contracts')">Smart Contracts</button><button class="pick-btn" onclick="togE(this,'AI/ML')">AI/ML</button><button class="pick-btn" onclick="togE(this,'UI/UX')">UI/UX</button><button class="pick-btn" onclick="togE(this,'Product')">Product</button><button class="pick-btn" onclick="togE(this,'Go-to-market')">Go-to-market</button><button class="pick-btn" onclick="togE(this,'DeFi Protocols')">DeFi Protocols</button><button class="pick-btn" onclick="togE(this,'Python')">Python</button><button class="pick-btn" onclick="togE(this,'DevOps')">DevOps</button>
+      </div>
+    </div>
+    <div class="field" style="margin-top:12px"><div class="field-label">Looking for</div>
+      <div class="pick-grid" id="editLookPicker">
+        <button class="pick-btn" onclick="togEL(this,'Developer')">Developer</button><button class="pick-btn" onclick="togEL(this,'Designer')">Designer</button><button class="pick-btn" onclick="togEL(this,'Business')">Business</button><button class="pick-btn" onclick="togEL(this,'AI/ML Engineer')">AI/ML Engineer</button><button class="pick-btn" onclick="togEL(this,'Solana Expert')">Solana Expert</button>
+      </div>
+    </div>
+    <div class="form-error hidden" id="editError"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeEditModal()">CANCEL</button>
+      <button class="btn-go" id="editSubmitBtn" onclick="submitEdit()">SAVE CHANGES →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEAVE GROUP MODAL -->
+<div class="overlay" id="leaveGroupOverlay">
+  <div class="modal" style="max-width:360px;text-align:center">
+    <div style="margin-bottom:1rem">
+      <div class="modal-title" style="margin-bottom:6px">Leave group?</div>
+      <div class="modal-sub" id="leaveGroupName"></div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1.5rem;line-height:1.6">You'll lose access to the group chat and messages.</p>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="document.getElementById('leaveGroupOverlay').classList.remove('open')">CANCEL</button>
+      <button class="btn-go" style="background:rgba(240,80,80,0.15);color:#f08080;border:1px solid rgba(240,80,80,0.2)" id="leaveGroupConfirmBtn" onclick="confirmLeaveGroup()">LEAVE GROUP</button>
+    </div>
+  </div>
+</div>
+
+<!-- MEMBER PROFILE MODAL -->
+<div class="overlay" id="memberProfileOverlay">
+  <div class="modal" style="max-width:320px">
+    <div class="modal-head">
+      <div id="memberProfileContent"></div>
+      <button class="close-btn" onclick="document.getElementById('memberProfileOverlay').classList.remove('open')">✕</button>
+    </div>
+    <div id="memberProfileActions" style="margin-top:1rem;display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+</div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="overlay" id="addMemberOverlay">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head">
+      <div><div class="modal-title">Add member</div><div class="modal-sub">Select from your existing teams</div></div>
+      <button class="close-btn" onclick="document.getElementById('addMemberOverlay').classList.remove('open')">✕</button>
+    </div>
+    <input type="hidden" id="addMemberGroupId">
+    <div id="addMemberList" style="max-height:280px;overflow-y:auto"></div>
+    <div style="margin-top:12px">
+      <button class="btn-cancel" style="width:100%" onclick="document.getElementById('addMemberOverlay').classList.remove('open')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE GROUP MODAL -->
+<div class="overlay" id="groupOverlay">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head">
+      <div><div class="modal-title">Create a group</div><div class="modal-sub">Add members from your existing teams</div></div>
+      <button class="close-btn" onclick="closeCreateGroupModal()">✕</button>
+    </div>
+    <div class="field">
+      <div class="field-label">Group name <span class="req">*</span></div>
+      <input class="f-input" id="groupName" type="text" placeholder="e.g. DeFi Squad, Team Alpha...">
+    </div>
+    <div class="field">
+      <div class="field-label">Add members</div>
+      <div id="groupMemberPicker" class="pick-grid" style="gap:6px">
+        <div style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace">Loading your team members...</div>
+      </div>
+    </div>
+    <div class="form-error hidden" id="groupError"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeCreateGroupModal()">CANCEL</button>
+      <button class="btn-go" id="groupSubmitBtn" onclick="submitCreateGroup()">CREATE GROUP →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import {
+  apiSignUp, apiSignIn, apiForgotPassword, apiSignOut, getCurrentUser,
+  apiGetProfiles, apiPostProfile, apiEditProfile, apiDeleteProfile,
+  apiGetSentInvites, apiGetReceivedInvites, apiSendInvite, apiRespondInvite,
+  apiGetTeams, apiGetMessages, apiSendMessage,
+  apiGetDraft, apiSaveDraft, apiUploadAvatar,
+  apiGetGroups, apiCreateGroup, apiGetGroupMessages, apiSendGroupMessage,
+  apiDeleteGroupMessage, apiAddGroupMember, apiRemoveGroupMember, apiLeaveGroup
+} from '/js/api.js';
+
+// ── constants ──────────────────────────────────────────
+const AVI=[{bg:'rgba(91,156,246,0.15)',color:'#7ab0f8'},{bg:'rgba(232,197,71,0.1)',color:'#D4B03A'},{bg:'rgba(54,201,176,0.12)',color:'#4ed4ba'},{bg:'rgba(167,139,250,0.12)',color:'#b89ffa'},{bg:'rgba(240,128,80,0.12)',color:'#f0a080'}];
+const TS={DeFi:'background:rgba(54,201,176,0.1);color:#4ed4ba;border:1px solid rgba(54,201,176,0.15)',Infrastructure:'background:rgba(91,156,246,0.1);color:#7ab0f8;border:1px solid rgba(91,156,246,0.15)',Consumer:'background:rgba(232,197,71,0.08);color:#D4B03A;border:1px solid rgba(232,197,71,0.12)',AI:'background:rgba(167,139,250,0.1);color:#b89ffa;border:1px solid rgba(167,139,250,0.15)',Gaming:'background:rgba(240,128,80,0.1);color:#f0a080;border:1px solid rgba(240,128,80,0.15)',Privacy:'background:rgba(255,255,255,0.05);color:#7a7870;border:1px solid rgba(255,255,255,0.08)'};
+const SC={Rust:'dev',TypeScript:'dev',React:'dev',Go:'dev',Python:'dev',DevOps:'dev','Smart Contracts':'sol',Solana:'sol','DeFi Protocols':'sol',Anchor:'sol','UI/UX':'design',Figma:'design',Product:'biz','Go-to-market':'biz',BD:'biz',Marketing:'biz','AI/ML':'ai',LLMs:'ai',Agents:'ai'};
+
+// ── state ──────────────────────────────────────────────
+let allProfiles=[], myInvites=[], selSkills=[], selLooking=[];
+let pAvatarBase64=null, eAvatarBase64=null;
+let editSkills=[], editLooking=[], editingProfileId=null;
+let F={track:'all',role:'all',tz:'all'}, authMode='signin', isForgot=false;
+let activeTeamId=null, activeGroupId=null, activeTab='messages', activeChatType='direct';
+let pollInterval=null, draftInterval=null;
+let lastMsgTime=null, lastDraftSave=null, draftDirty=false;
+let allTeams=[], selectedGroupMembers=[];
+window.currentUser=getCurrentUser();
+
+// ── helpers ────────────────────────────────────────────
+const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const aviColor=id=>{let h=0;for(let c of id)h=(h*31+c.charCodeAt(0))&0xffffffff;return AVI[Math.abs(h)%AVI.length]};
+const sc=s=>SC[s]||'biz';
+const ts=t=>TS[t]||'background:rgba(255,255,255,0.05);color:#7a7870;border:1px solid rgba(255,255,255,0.08)';
+const fmtTime=s=>{try{const d=new Date(s.includes('T')?s:s+' UTC');return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}catch{return ''}};
+
+// ── pages ──────────────────────────────────────────────
+window.showPage=page=>{
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page+'Page').classList.add('active');
+  if(page==='teams') loadTeams();
+  closeBell();
+};
+
+// ── card ───────────────────────────────────────────────
+function cardHTML(b) {
+  const av=aviColor(b.id), isOwn=window.currentUser?.id===b.user_id;
+  const tzS=(b.timezone||'').replace('Europe / Africa','EU/AF').replace('Asia / Pacific','AS/PAC');
+  const socialLinks=[];
+  if(b.github)  socialLinks.push(`<a class="social-link" href="https://github.com/${b.github}" target="_blank" title="GitHub"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg></a>`);
+  if(b.twitter) socialLinks.push(`<a class="social-link" href="https://twitter.com/${b.twitter}" target="_blank" title="X/Twitter"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>`);
+  if(b.website) socialLinks.push(`<a class="social-link" href="${b.website.startsWith('http')?b.website:'https://'+b.website}" target="_blank" title="Website"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></a>`);
+  const actions=isOwn
+    ?`<div class="card-actions" onclick="event.stopPropagation()"><button class="edit-btn" onclick="openEditModal('${b.id}')">EDIT</button><button class="del-btn" onclick="window.deleteMyProfile('${b.id}')">DEL</button></div>`
+    :`<div class="card-actions" onclick="event.stopPropagation()"><button class="invite-btn" id="ib-${b.id}" onclick="window.handleInvite('${b.id}',this)">INVITE</button></div>`;
+  const avatarEl=b.avatar_url?`<img class="card-avi-img" src="${b.avatar_url}" alt="${b.name}">`:`<div class="avi" style="background:${av.bg};color:${av.color}">${ini(b.name)}</div>`;
+  return `<div class="card" onclick="window.location.href='/profile.html?id=${b.id}'" style="cursor:pointer">
+    <div class="card-head">
+      ${avatarEl}
+      <div class="card-info"><div class="card-name">${b.name}</div><div class="card-role">${b.role}</div>${socialLinks.length?`<div class="social-links">${socialLinks.join('')}</div>`:''}</div>
+      <div class="online-dot ${b.is_active?'':'off'}"></div>
+    </div>
+    <div class="need-row">needs: ${(b.looking_for||[]).map(r=>`<span class="need-tag">${r}</span>`).join('')}</div>
+    <p class="card-bio">${b.bio}</p>
+    <div class="card-tags">${(b.skills||[]).map(s=>`<span class="tag tag-${sc(s)}">${s}</span>`).join('')}</div>
+    <div class="card-footer"><div class="card-meta-row"><span class="meta-chip">${tzS}</span><span class="track-chip" style="${ts(b.track)}">${(b.track||'').toUpperCase()}</span></div>${actions}</div>
+  </div>`;
+}
+
+function render() {
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const sort=document.getElementById('sortSel').value;
+  let list=allProfiles.filter(b=>{
+    const mq=!q||b.name.toLowerCase().includes(q)||b.role.toLowerCase().includes(q)||(b.skills||[]).some(s=>s.toLowerCase().includes(q))||b.bio.toLowerCase().includes(q);
+    return mq&&(F.track==='all'||b.track===F.track)&&(F.role==='all'||(b.looking_for||[]).includes(F.role))&&(F.tz==='all'||b.timezone===F.tz);
+  });
+  if(sort==='active') list.sort((a,b)=>b.is_active-a.is_active);
+  else if(sort==='az') list.sort((a,b)=>a.name.localeCompare(b.name));
+  const g=document.getElementById('grid');
+  g.innerHTML=list.length?list.map(cardHTML).join(''):`<div class="empty"><p style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-bottom:8px">NO BUILDERS MATCH</p><p>Try adjusting your filters</p></div>`;
+  document.getElementById('countLabel').textContent=`${list.length} builder${list.length!==1?'s':''}`;
+}
+window.render=render;
+
+window.setF=(type,val,el)=>{F[type]=val;const map={track:'trackList',role:'roleList',tz:'tzList'};document.querySelectorAll(`#${map[type]} .filter-item`).forEach(i=>i.classList.remove('active'));el.classList.add('active');render()};
+
+async function load() {
+  try {
+    allProfiles=await apiGetProfiles();
+    const countries=new Set(allProfiles.map(p=>p.country).filter(Boolean));
+    document.getElementById('sBuilders').textContent=allProfiles.length;
+    document.getElementById('sCountries').textContent=countries.size;
+    render();
+    if(window.currentUser) loadBell();
+  } catch(e){document.getElementById('grid').innerHTML=`<div class="empty"><p>Failed to load profiles.</p></div>`;}
+}
+
+// ── invite ─────────────────────────────────────────────
+window.handleInvite=async(profileId,btn)=>{
+  if(!window.currentUser){openAuthModal('signin');return}
+  if(btn.classList.contains('sent')) return;
+  btn.disabled=true;
+  try{await apiSendInvite(profileId);myInvites.push(profileId);btn.classList.add('sent');btn.textContent='✓ SENT';toast('Invite sent — they\'ll be notified by email');}
+  catch(e){toast(e.message,true);btn.disabled=false;}
+};
+
+window.deleteMyProfile=async(id)=>{
+  if(!confirm('Delete your profile?')) return;
+  try{await apiDeleteProfile(id);allProfiles=allProfiles.filter(p=>p.id!==id);document.getElementById('sBuilders').textContent=allProfiles.length;render();toast('Profile deleted');}
+  catch(e){toast(e.message,true);}
+};
+
+// ── bell / invites ─────────────────────────────────────
+async function loadBell() {
+  if(!window.currentUser) return;
+  try {
+    const invites=await apiGetReceivedInvites();
+    const pending=invites.filter(i=>i.status==='pending');
+    const badge=document.getElementById('bellBadge');
+    if(pending.length){badge.textContent=pending.length;badge.classList.remove('hidden');}
+    else badge.classList.add('hidden');
+
+    const list=document.getElementById('bellList');
+    if(!invites.length){list.innerHTML='<div class="bell-empty">No invites yet</div>';return;}
+    list.innerHTML=invites.map(inv=>`
+      <div class="invite-notif" id="notif-${inv.id}">
+        <div class="notif-name">${inv.from_name||'Unknown builder'}</div>
+        <div class="notif-role">${inv.from_role||''}</div>
+        ${inv.status==='pending'
+          ?`<div class="notif-actions">
+              <button class="accept-btn" onclick="respondInvite('${inv.id}','accept')">ACCEPT</button>
+              <button class="decline-btn" onclick="respondInvite('${inv.id}','decline')">DECLINE</button>
+            </div>`
+          :`<span class="notif-status ${inv.status}">${inv.status.toUpperCase()}</span>`}
+      </div>`).join('');
+  } catch(e){}
+}
+
+window.toggleBell=()=>{
+  const dd=document.getElementById('bellDropdown');
+  dd.classList.toggle('hidden');
+  if(!dd.classList.contains('hidden')) loadBell();
+};
+function closeBell(){document.getElementById('bellDropdown')?.classList.add('hidden');}
+document.addEventListener('click',e=>{if(!document.getElementById('bellWrap')?.contains(e.target)) closeBell();});
+
+window.respondInvite=async(id,action)=>{
+  try{
+    const result=await apiRespondInvite(id,action);
+    if(action==='accept'){toast('Invite accepted — team formed! 🎉 Check My Teams.');await loadBell();await loadTeams();}
+    else{toast('Invite declined');await loadBell();}
+  }catch(e){toast(e.message,true);}
+};
+
+// poll bell every 30s
+setInterval(()=>{if(window.currentUser) loadBell();},30000);
+
+// ── TEAMS + CHAT ───────────────────────────────────────
+// ── sidebar tab switching ──────────────────────────────
+window.switchSidebarTab = (tab) => {
+  document.getElementById('tabDirect').classList.toggle('active', tab==='direct');
+  document.getElementById('tabGroups').classList.toggle('active', tab==='groups');
+  document.getElementById('directList').style.display = tab==='direct'?'block':'none';
+  document.getElementById('groupsList').style.display = tab==='groups'?'block':'none';
+  if(tab==='groups') loadGroups();
+};
+
+async function loadTeams() {
+  if(!window.currentUser) return;
+  try {
+    allTeams = await apiGetTeams();
+    const list=document.getElementById('directList');
+    if(!allTeams.length){list.innerHTML='<div style="padding:2rem;text-align:center;color:var(--faint);font-size:12px">No teams yet.<br>Accept an invite to form a team.</div>';return;}
+    list.innerHTML=allTeams.map(t=>{
+      const av=aviColor(t.partner_user_id);
+      const avatarEl=t.partner_avatar_url
+        ?`<img src="${t.partner_avatar_url}" style="width:32px;height:32px;border-radius:5px;object-fit:cover;flex-shrink:0">`
+        :`<div class="avi" style="width:32px;height:32px;font-size:11px;border-radius:5px;background:${av.bg};color:${av.color};flex-shrink:0">${ini(t.partner_name)}</div>`;
+      return `<div class="team-item ${activeTeamId===t.team_id?'active':''}" data-id="${t.team_id}" onclick="window.openTeamChat('${t.team_id}','${t.partner_name}','${t.partner_role}','${t.partner_user_id}','${t.partner_avatar_url||''}')">
+        ${avatarEl}
+        <div class="team-item-info"><div class="team-item-name">${t.partner_name}${t.unread>0?` <span class="team-unread">${t.unread}</span>`:''}</div><div class="team-item-role">${t.partner_role||''}</div></div>
+      </div>`;
+    }).join('');
+  }catch(e){console.error(e);}
+}
+
+// ── GROUP LOADING ──────────────────────────────────────
+async function loadGroups() {
+  if(!window.currentUser) return;
+  try {
+    const groups = await apiGetGroups();
+    const list = document.getElementById('groupListItems');
+    if(!groups.length){
+      list.innerHTML='<div style="padding:1.5rem;text-align:center;color:var(--faint);font-size:12px">No groups yet.<br>Create one above.</div>';
+      return;
+    }
+    list.innerHTML = groups.map(g=>`
+      <div class="group-item ${activeGroupId===g.id?'active':''}" data-gid="${g.id}" onclick="window.openGroupChat('${g.id}','${escAttr(g.name)}')">
+        <div class="group-icon">${ini(g.name)}</div>
+        <div class="group-info">
+          <div class="group-name">${esc(g.name)}</div>
+          <div class="group-meta">${g.member_count} member${g.member_count!==1?'s':''} ${g.last_message?'· '+esc(g.last_message).slice(0,20)+'...':''}</div>
+        </div>
+      </div>`).join('');
+  } catch(e){ console.error(e); }
+}
+
+// ── CREATE GROUP MODAL ─────────────────────────────────
+window.openCreateGroupModal = async () => {
+  document.getElementById('groupName').value='';
+  document.getElementById('groupError').classList.add('hidden');
+  selectedGroupMembers=[];
+
+  // load team members into picker
+  const picker = document.getElementById('groupMemberPicker');
+  if(!allTeams.length){
+    try{ allTeams = await apiGetTeams(); }catch(e){}
+  }
+  if(!allTeams.length){
+    picker.innerHTML='<div style="font-size:12px;color:var(--faint);font-family:\'IBM Plex Mono\',monospace">No team members yet</div>';
+  } else {
+    picker.innerHTML = allTeams.map(t=>{
+      const av=aviColor(t.partner_user_id);
+      const imgEl=t.partner_avatar_url?`<img src="${t.partner_avatar_url}" style="width:20px;height:20px;border-radius:3px;object-fit:cover">`:`<span style="font-size:9px">${ini(t.partner_name)}</span>`;
+      return `<button class="pick-btn" style="display:flex;align-items:center;gap:6px" data-uid="${t.partner_user_id}" onclick="toggleGroupMember(this,'${t.partner_user_id}')">
+        <span style="width:20px;height:20px;border-radius:3px;background:${av.bg};color:${av.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-family:'IBM Plex Mono',monospace">${imgEl}</span>
+        ${esc(t.partner_name)}
+      </button>`;
+    }).join('');
+  }
+  document.getElementById('groupOverlay').classList.add('open');
+};
+
+window.closeCreateGroupModal = () => document.getElementById('groupOverlay').classList.remove('open');
+document.getElementById('groupOverlay').addEventListener('click', e=>{ if(e.target===document.getElementById('groupOverlay')) window.closeCreateGroupModal(); });
+document.getElementById('addMemberOverlay').addEventListener('click', e=>{ if(e.target===document.getElementById('addMemberOverlay')) document.getElementById('addMemberOverlay').classList.remove('open'); });
+
+window.toggleGroupMember = (btn, uid) => {
+  btn.classList.toggle('on');
+  selectedGroupMembers = btn.classList.contains('on')
+    ? [...selectedGroupMembers, uid]
+    : selectedGroupMembers.filter(x=>x!==uid);
+};
+
+window.submitCreateGroup = async () => {
+  const name = document.getElementById('groupName').value.trim();
+  const errEl = document.getElementById('groupError');
+  const btn = document.getElementById('groupSubmitBtn');
+  errEl.classList.add('hidden');
+  if(!name){ errEl.textContent='Group name required'; errEl.classList.remove('hidden'); return; }
+  btn.disabled=true; btn.textContent='CREATING...';
+  try {
+    await apiCreateGroup(name, selectedGroupMembers);
+    window.closeCreateGroupModal();
+    loadGroups();
+    toast(`Group "${name}" created!`);
+  } catch(e){ errEl.textContent=e.message; errEl.classList.remove('hidden'); }
+  finally{ btn.disabled=false; btn.textContent='CREATE GROUP →'; }
+};
+
+// ── GROUP CHAT ─────────────────────────────────────────
+window.openGroupChat = async (groupId, groupName) => {
+  if(pollInterval) clearInterval(pollInterval);
+  if(draftInterval) clearInterval(draftInterval);
+  activeGroupId=groupId; activeTeamId=null; activeChatType='group';
+  lastMsgTime=null; draftDirty=false; pendingFileBase64=null; pendingFileName=null;
+
+  document.getElementById('noTeamMsg').classList.add('hidden');
+  document.getElementById('membersRow').classList.remove('hidden');
+  document.getElementById('tabDraft').classList.add('hidden');
+  document.getElementById('attachBtn').style.display='flex';
+  document.getElementById('filePreviewBar').style.display='none';
+  const cc=document.getElementById('chatContent');
+  cc.classList.remove('hidden');
+  cc.style.display='flex'; cc.style.flexDirection='column'; cc.style.flex='1';
+
+  document.getElementById('chatHeader').innerHTML=`
+    <div class="group-icon" style="width:36px;height:36px;font-size:13px;border-radius:6px">${ini(groupName)}</div>
+    <div><div class="chat-partner-name">${esc(groupName)}</div><div class="chat-partner-role" id="groupMemberCount">Group chat</div></div>
+    <button onclick="openLeaveGroupModal('${groupId}','${groupName.replace(/'/g,"&#39;")}')" style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:4px 10px;border:1px solid rgba(240,80,80,0.2);border-radius:4px;background:rgba(240,80,80,0.06);color:#f08080;cursor:pointer">LEAVE</button>`;
+
+  document.querySelectorAll('.group-item').forEach(el=>el.classList.remove('active'));
+  document.querySelector(`.group-item[data-gid="${groupId}"]`)?.classList.add('active');
+
+  switchTab('messages');
+  await loadGroupMessages(false);
+  pollInterval = setInterval(()=>loadGroupMessages(true), 4000);
+};
+
+// ── LEAVE GROUP MODAL ──────────────────────────────────
+let _leaveGroupId = null;
+window.openLeaveGroupModal = (groupId, groupName) => {
+  _leaveGroupId = groupId;
+  document.getElementById('leaveGroupName').textContent = `"${groupName}"`;
+  document.getElementById('leaveGroupOverlay').classList.add('open');
+};
+window.confirmLeaveGroup = async () => {
+  if(!_leaveGroupId) return;
+  const btn = document.getElementById('leaveGroupConfirmBtn');
+  btn.disabled=true; btn.textContent='LEAVING...';
+  try {
+    await apiLeaveGroup(_leaveGroupId);
+    document.getElementById('leaveGroupOverlay').classList.remove('open');
+    activeGroupId=null; activeChatType='direct';
+    document.getElementById('chatContent').classList.add('hidden');
+    document.getElementById('noTeamMsg').classList.remove('hidden');
+    document.getElementById('membersRow').classList.add('hidden');
+    document.getElementById('tabDraft').classList.remove('hidden');
+    document.getElementById('attachBtn').style.display='none';
+    loadGroups(); toast('Left group');
+  } catch(e){ toast(e.message,true); }
+  finally{ btn.disabled=false; btn.textContent='LEAVE GROUP'; }
+};
+document.getElementById('leaveGroupOverlay')?.addEventListener('click',e=>{if(e.target===document.getElementById('leaveGroupOverlay'))document.getElementById('leaveGroupOverlay').classList.remove('open')});
+document.getElementById('memberProfileOverlay')?.addEventListener('click',e=>{if(e.target===document.getElementById('memberProfileOverlay'))document.getElementById('memberProfileOverlay').classList.remove('open')});
+
+async function loadGroupMessages(onlyNew=false) {
+  if(!activeGroupId) return;
+  try {
+    const data = await apiGetGroupMessages(activeGroupId, onlyNew?lastMsgTime:null);
+    const msgs    = data.messages || [];
+    const members = data.members  || [];
+    const isAdmin = data.isAdmin  || false;
+
+    const countEl = document.getElementById('groupMemberCount');
+    if(countEl) countEl.textContent = members.length + ' member' + (members.length!==1?'s':'');
+
+    const av2=function(id){let h=0;for(let i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))&0xffffffff;return AVI[Math.abs(h)%AVI.length]};
+    document.getElementById('membersRow').innerHTML =
+      '<div class="members-row">' +
+      members.map(function(m){
+        const a=av2(m.id);
+        const avi=m.avatar_url
+          ?'<img class="member-chip-avi" src="'+m.avatar_url+'">'
+          :'<span style="width:16px;height:16px;border-radius:3px;background:'+a.bg+';color:'+a.color+';display:inline-flex;align-items:center;justify-content:center;font-family:\'IBM Plex Mono\',monospace;font-size:8px;font-weight:600">'+ini(m.name||'?')+'</span>';
+        const safeName=(m.name||'').replace(/'/g,'&#39;');
+        const safeRole=(m.role||'').replace(/'/g,'&#39;');
+        const safeAvatar=(m.avatar_url||'').replace(/'/g,'&#39;');
+        return '<span class="member-chip" style="cursor:pointer" onclick="window.openMemberProfile(\''+m.id+'\',\''+safeName+'\',\''+safeRole+'\',\''+safeAvatar+'\',\''+activeGroupId+'\','+isAdmin+')">'+avi+esc(m.name||'')+'</span>';
+      }).join('') +
+      '<button class="add-member-btn" onclick="openAddMemberModal(\''+activeGroupId+'\')">+ Add</button>' +
+      '</div>';
+
+    if(!msgs.length && !onlyNew){document.getElementById('chatMsgs').innerHTML='<div class="chat-empty">No messages yet — say hello!</div>';return;}
+    if(!msgs.length) return;
+    lastMsgTime=msgs[msgs.length-1].created_at;
+    const container=document.getElementById('chatMsgs');
+    const atBottom=container.scrollHeight-container.scrollTop-container.clientHeight<80;
+    if(onlyNew){
+      msgs.forEach(function(m){const d=document.createElement('div');d.innerHTML=groupMsgHTML(m,isAdmin);container.appendChild(d.firstChild);});
+    } else {
+      let lastDate='', html='';
+      msgs.forEach(function(m){
+        const dateStr=formatDateLabel(m.created_at);
+        if(dateStr!==lastDate){html+='<div class="date-divider">'+dateStr+'</div>';lastDate=dateStr;}
+        html+=groupMsgHTML(m,isAdmin);
+      });
+      container.innerHTML=html;
+    }
+    if(!onlyNew||atBottom) container.scrollTop=container.scrollHeight;
+  }catch(e){console.error(e);}
+}
+
+function formatDateLabel(ts) {
+  try {
+    const d=new Date(ts.includes('T')?ts:ts+' UTC');
+    const today=new Date(); const yesterday=new Date(today); yesterday.setDate(today.getDate()-1);
+    if(d.toDateString()===today.toDateString()) return 'Today';
+    if(d.toDateString()===yesterday.toDateString()) return 'Yesterday';
+    return d.toLocaleDateString([],{weekday:'long',month:'short',day:'numeric'});
+  } catch(e){ return ''; }
+}
+
+function groupMsgHTML(m, isAdmin) {
+  isAdmin = isAdmin || false;
+  const mine = m.from_user_id === window.currentUser?.id;
+  const canAct = (mine || isAdmin) && !m.deleted;
+  const av = aviColor(m.from_user_id);
+  const safeBody = (m.body||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+
+  const avatarEl = m.from_avatar
+    ? '<img class="msg-sender-avi" src="'+m.from_avatar+'">'
+    : '<div class="msg-sender-avi" style="background:'+av.bg+';color:'+av.color+';display:flex;align-items:center;justify-content:center;font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:600">'+ini(m.from_name||'?')+'</div>';
+
+  let content = '';
+  if (m.deleted) {
+    content = '<span class="msg-deleted">🚫 Message deleted</span>';
+  } else if (m.type === 'image' && m.file_url) {
+    content = '<img class="msg-image" src="'+m.file_url+'" onclick="window.openLightbox(\''+m.file_url+'\')" alt="Image">'
+             + (m.body && m.body !== 'Image' ? '<div class="msg-caption">'+esc(m.body)+'</div>' : '');
+  } else if (m.type === 'file' && m.file_url) {
+    const ext = (m.body || '').split('.').pop().toUpperCase().slice(0,4) || 'FILE';
+    content = '<a class="msg-file" href="'+m.file_url+'" target="_blank">'
+             + '<div class="msg-file-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>'
+             + '<div class="msg-file-info"><div class="msg-file-name">'+esc(m.body)+'</div><div class="msg-file-label">'+ext+' · Download</div></div>'
+             + '</a>';
+  } else {
+    content = escHtml(m.body || '');
+  }
+
+  const clickHandler = canAct
+    ? 'onclick="window.showMsgContextMenu(event,\''+m.id+'\',\''+safeBody+'\','+(mine?'true':'false')+','+(isAdmin?'true':'false')+',\''+activeGroupId+'\')"'
+    : '';
+  const time = fmtTime(m.created_at);
+
+  if (mine) {
+    return '<div class="msg-row" style="align-items:flex-end" data-msg-id="'+m.id+'" '+clickHandler+'>'
+      + '<div class="msg-bubble mine'+(m.deleted?' deleted':'')+'">'+content+'</div>'
+      + '<div class="msg-meta mine">'+time+'</div>'
+      + '</div>';
+  } else {
+    return '<div class="msg-row" style="align-items:flex-start" data-msg-id="'+m.id+'" '+clickHandler+'>'
+      + '<div style="display:flex;align-items:flex-end;gap:8px;max-width:72%">'
+      + avatarEl
+      + '<div style="display:flex;flex-direction:column;gap:2px;min-width:0">'
+      + '<div class="msg-sender-name">'+esc(m.from_name||'')+'</div>'
+      + '<div class="msg-bubble theirs'+(m.deleted?' deleted':'')+'">'+content+'</div>'
+      + '<div class="msg-meta theirs">'+time+'</div>'
+      + '</div></div></div>';
+  }
+}
+
+window.openMemberProfile = async function(userId, name, role, avatarUrl, groupId, isAdmin) {
+  const av=aviColor(userId);
+  const avatarEl=avatarUrl
+    ?'<img src="'+avatarUrl+'" style="width:56px;height:56px;border-radius:10px;object-fit:cover">'
+    :'<div style="width:56px;height:56px;border-radius:10px;background:'+av.bg+';color:'+av.color+';display:flex;align-items:center;justify-content:center;font-family:\'IBM Plex Mono\',monospace;font-weight:600;font-size:18px">'+ini(name)+'</div>';
+  document.getElementById('memberProfileContent').innerHTML=
+    '<div style="display:flex;align-items:center;gap:14px">'
+    +avatarEl
+    +'<div>'
+    +'<div style="font-size:15px;font-weight:600;color:var(--white);margin-bottom:3px">'+esc(name)+'</div>'
+    +'<div style="font-size:12px;color:var(--muted)">'+esc(role||'Builder')+'</div>'
+    +'</div></div>';
+  document.getElementById('memberProfileActions').innerHTML='<div style="font-size:11px;color:var(--faint);font-family:\'IBM Plex Mono\',monospace;text-align:center;padding:8px">Loading profile...</div>';
+  document.getElementById('memberProfileOverlay').classList.add('open');
+
+  // fetch full profile from API to get profile ID
+  const isSelf=userId===window.currentUser?.id;
+  try {
+    const res = await fetch('/api/profiles');
+    const data = await res.json();
+    const profile = data.profiles?.find(p=>p.user_id===userId);
+    const actions = document.getElementById('memberProfileActions');
+    let html='';
+
+    if(profile) {
+      // update modal with full profile info
+      document.getElementById('memberProfileContent').innerHTML=
+        '<div style="display:flex;align-items:center;gap:14px">'
+        +avatarEl
+        +'<div>'
+        +'<div style="font-size:15px;font-weight:600;color:var(--white);margin-bottom:3px">'+esc(profile.name)+'</div>'
+        +'<div style="font-size:12px;color:var(--muted);margin-bottom:6px">'+esc(profile.role||'')+'</div>'
+        // social links
+        +(profile.github?'<a href="https://github.com/'+esc(profile.github)+'" target="_blank" style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:var(--muted);text-decoration:none;margin-right:10px">gh/'+esc(profile.github)+'</a>':'')
+        +(profile.twitter?'<a href="https://twitter.com/'+esc(profile.twitter)+'" target="_blank" style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:var(--muted);text-decoration:none;margin-right:10px">@'+esc(profile.twitter)+'</a>':'')
+        +'</div></div>';
+
+      if(!isSelf) html+='<a href="/profile.html?id='+profile.id+'" style="display:block;text-align:center;padding:9px;font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:600;letter-spacing:0.04em;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(232,197,71,0.2);border-radius:4px;text-decoration:none">VIEW FULL PROFILE →</a>';
+    } else {
+      if(!isSelf) html+='<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px">No public profile yet</div>';
+    }
+
+    if(isAdmin&&!isSelf) {
+      html+='<button onclick="window.removeMemberFromGroup(\''+groupId+'\',\''+userId+'\',\''+name.replace(/'/g,'&#39;')+'\',this)" style="width:100%;padding:8px;font-family:\'IBM Plex Mono\',monospace;font-size:11px;color:#f08080;background:rgba(240,80,80,0.06);border:1px solid rgba(240,80,80,0.2);border-radius:4px;cursor:pointer;margin-top:4px">REMOVE FROM GROUP</button>';
+    }
+    if(isSelf) html+='<div style="font-size:11px;color:var(--faint);font-family:\'IBM Plex Mono\',monospace;text-align:center;padding:4px">This is you</div>';
+    actions.innerHTML=html;
+  } catch(e) {
+    document.getElementById('memberProfileActions').innerHTML='<div style="font-size:12px;color:var(--faint);text-align:center">Could not load profile</div>';
+  }
+};
+
+window.removeMemberFromGroup = async function(groupId, userId, name, btn) {
+  if(btn) btn.disabled=true;
+  try {
+    await apiRemoveGroupMember(groupId, userId);
+    document.getElementById('memberProfileOverlay').classList.remove('open');
+    window.toast(name+' removed from group');
+    loadGroupMessages(false);
+  } catch(e){ window.toast(e.message,true); if(btn) btn.disabled=false; }
+};
+
+// ── FILE ATTACHMENT ────────────────────────────────────
+let pendingFileBase64=null, pendingFileName=null;
+
+window.handleGroupFileSelect = function(input) {
+  const file=input.files[0];
+  if(!file) return;
+  if(file.size>3000000){ window.toast('File too large. Max 3MB.',true); return; }
+  const reader=new FileReader();
+  reader.onload=function(e){
+    pendingFileBase64=e.target.result; pendingFileName=file.name;
+    const bar=document.getElementById('filePreviewBar');
+    const img=document.getElementById('filePreviewImg');
+    bar.style.display='flex';
+    if(file.type.startsWith('image/')){ img.src=pendingFileBase64; img.style.display='block'; }
+    else { img.style.display='none'; }
+    document.getElementById('filePreviewName').textContent=file.name;
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+};
+
+window.clearFileAttachment = function() {
+  pendingFileBase64=null; pendingFileName=null;
+  document.getElementById('filePreviewBar').style.display='none';
+};
+// override sendMsg to handle both direct and group (with file support)
+let _isSending = false;
+window.sendMsg = async () => {
+  if(_isSending) return;
+  _isSending = true;
+  const input=document.getElementById('chatInput');
+  const body=input?.value?.trim();
+  if(!body && !pendingFileBase64) return;
+  const btn=document.getElementById('sendBtn');
+  const origText=btn.textContent;
+  input.value=''; btn.disabled=true;
+  if(pendingFileBase64) btn.textContent='UPLOADING...';
+  try {
+    if(activeChatType==='group' && activeGroupId) {
+      const msg=await apiSendGroupMessage(activeGroupId, body||'', pendingFileBase64, pendingFileName);
+      window.clearFileAttachment();
+      lastMsgTime=msg.created_at;
+      const container=document.getElementById('chatMsgs');
+      const d=document.createElement('div'); d.innerHTML=groupMsgHTML(msg,false); container.appendChild(d.firstChild);
+      container.scrollTop=container.scrollHeight;
+    } else if(activeTeamId) {
+      const msg=await apiSendMessage(activeTeamId, body);
+      lastMsgTime=msg.created_at;
+      const container=document.getElementById('chatMsgs');
+      const d=document.createElement('div'); d.innerHTML=msgHTML(msg); container.appendChild(d.firstChild);
+      container.scrollTop=container.scrollHeight;
+      loadTeams();
+    }
+  }catch(e){toast(e.message,true); input.value=body;}
+  finally{btn.disabled=false; btn.textContent=origText; _isSending=false;}
+};
+
+// add member to group
+window.openAddMemberModal = async (groupId) => {
+  if(!allTeams.length){ try{ allTeams=await apiGetTeams(); }catch(e){} }
+
+  // Build modal content
+  const picker = allTeams.map(t => {
+    const av = aviColor(t.partner_user_id);
+    const imgEl = t.partner_avatar_url
+      ? `<img src="${t.partner_avatar_url}" style="width:28px;height:28px;border-radius:4px;object-fit:cover;flex-shrink:0">`
+      : `<span style="width:28px;height:28px;border-radius:4px;background:${av.bg};color:${av.color};display:inline-flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;flex-shrink:0">${ini(t.partner_name)}</span>`;
+    return `<div class="team-item" style="border-radius:6px;border:1px solid var(--border);margin-bottom:4px;padding:8px 10px"
+      onclick="window.confirmAddMember('${groupId}','${t.partner_user_id}','${escAttr(t.partner_name)}',this)">
+      ${imgEl}
+      <div class="team-item-info">
+        <div class="team-item-name">${esc(t.partner_name)}</div>
+        <div class="team-item-role">${esc(t.partner_role||'Builder')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Inject into a reusable modal
+  document.getElementById('addMemberList').innerHTML = picker || '<div style="color:var(--faint);font-size:12px;padding:8px">No team members available</div>';
+  document.getElementById('addMemberGroupId').value = groupId;
+  document.getElementById('addMemberOverlay').classList.add('open');
+};
+
+window.confirmAddMember = async (groupId, userId, name, el) => {
+  // highlight selected
+  document.querySelectorAll('#addMemberList .team-item').forEach(i => i.style.borderColor='var(--border)');
+  el.style.borderColor = 'rgba(232,197,71,0.4)';
+  try {
+    await apiAddGroupMember(groupId, userId);
+    document.getElementById('addMemberOverlay').classList.remove('open');
+    toast(`${name} added to group`);
+    loadGroupMessages(false);
+  } catch(e) {
+    toast(e.message, true);
+    el.style.borderColor = 'var(--border)';
+  }
+};
+
+window.openTeamChat = async function(teamId,partnerName,partnerRole,partnerUserId,partnerAvatar) {
+  if(pollInterval) clearInterval(pollInterval);
+  if(draftInterval) clearInterval(draftInterval);
+  activeTeamId=teamId; activeGroupId=null; activeChatType='direct';
+  lastMsgTime=null; draftDirty=false;
+
+  document.getElementById('noTeamMsg').classList.add('hidden');
+  document.getElementById('membersRow').classList.add('hidden');
+  document.getElementById('tabDraft').classList.remove('hidden');
+  const cc=document.getElementById('chatContent');
+  cc.classList.remove('hidden');
+  cc.style.display='flex';
+  cc.style.flexDirection='column';
+  cc.style.flex='1';
+
+  // header with avatar
+  const av=aviColor(partnerUserId);
+  const avatarEl=partnerAvatar
+    ?`<img src="${partnerAvatar}" style="width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0">`
+    :`<div class="avi" style="width:36px;height:36px;font-size:12px;border-radius:6px;background:${av.bg};color:${av.color}">${ini(partnerName)}</div>`;
+  document.getElementById('chatHeader').innerHTML=`
+    ${avatarEl}
+    <div><div class="chat-partner-name">${partnerName}</div><div class="chat-partner-role">${partnerRole}</div></div>`;
+
+  document.querySelectorAll('.team-item').forEach(el=>el.classList.remove('active'));
+  const activeItem=document.querySelector(`.team-item[data-id="${teamId}"]`);
+  if(activeItem) activeItem.classList.add('active');
+
+  switchTab('messages');
+  await loadMessages(false);
+  await loadDraft();
+
+  pollInterval=setInterval(()=>loadMessages(true), 4000);
+  draftInterval=setInterval(()=>syncDraft(), 8000);
+}
+
+window.switchTab=tab=>{
+  activeTab=tab;
+  document.getElementById('tabMessages').classList.toggle('active',tab==='messages');
+  document.getElementById('tabDraft').classList.toggle('active',tab==='draft');
+  document.getElementById('messagesTab').classList.toggle('active',tab==='messages');
+  document.getElementById('draftTab').classList.toggle('active',tab==='draft');
+  if(tab==='draft') loadDraft();
+};
+
+async function loadMessages(onlyNew=false) {
+  if(!activeTeamId) return;
+  try {
+    const msgs=await apiGetMessages(activeTeamId, onlyNew?lastMsgTime:null);
+    if(!msgs.length&&!onlyNew){document.getElementById('chatMsgs').innerHTML='<div class="chat-empty">No messages yet — say hello!</div>';return;}
+    if(!msgs.length) return;
+    lastMsgTime=msgs[msgs.length-1].created_at;
+    const container=document.getElementById('chatMsgs');
+    const atBottom=container.scrollHeight-container.scrollTop-container.clientHeight<80;
+    if(onlyNew){msgs.forEach(m=>{const d=document.createElement('div');d.innerHTML=msgHTML(m);container.appendChild(d.firstChild);});}
+    else container.innerHTML=msgs.map(msgHTML).join('');
+    if(!onlyNew||atBottom) container.scrollTop=container.scrollHeight;
+    loadTeams(); // refresh unread counts
+  }catch(e){}
+}
+
+function msgHTML(m) {
+  const mine = m.from_user_id === window.currentUser?.id;
+  const time  = fmtTime(m.created_at);
+  const safeBody = (m.body||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+  const clickHandler = mine
+    ? 'onclick="window.showDirectMsgContext(event,\''+m.id+'\',\''+safeBody+'\')"'
+    : '';
+
+  if(mine) {
+    return '<div class="msg-row" style="align-items:flex-end" data-msg-id="'+m.id+'" '+clickHandler+'>'
+      + '<div class="msg-bubble mine">'+escHtml(m.body)+'</div>'
+      + '<div class="msg-meta mine">'+time+'</div>'
+      + '</div>';
+  } else {
+    const av = aviColor(m.from_user_id);
+    const avatarEl = m.from_avatar
+      ? '<img class="msg-sender-avi" src="'+m.from_avatar+'">'
+      : '<div class="msg-sender-avi" style="background:'+av.bg+';color:'+av.color+';display:flex;align-items:center;justify-content:center;font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:600">'+ini(m.from_name||'?')+'</div>';
+    return '<div class="msg-row" style="align-items:flex-start" data-msg-id="'+m.id+'">'
+      + '<div style="display:flex;align-items:flex-end;gap:8px;max-width:72%">'
+      + avatarEl
+      + '<div style="display:flex;flex-direction:column;gap:2px;min-width:0">'
+      + '<div class="msg-bubble theirs">'+escHtml(m.body)+'</div>'
+      + '<div class="msg-meta theirs">'+time+'</div>'
+      + '</div></div></div>';
+  }
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function esc(s){return escHtml(String(s||''))}
+function escAttr(s){return String(s||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;')}
+
+
+// ── DRAFT ──────────────────────────────────────────────
+let _draftContent='';
+
+async function loadDraft() {
+  if(!activeTeamId) return;
+  try{
+    const d=await apiGetDraft(activeTeamId);
+    _draftContent=d.content||'';
+    document.getElementById('draftContent').value=_draftContent;
+    updateDraftStatus(d.updated_at);
+  }catch(e){}
+}
+
+async function syncDraft() {
+  if(!activeTeamId||activeTab!=='draft') return;
+  try{
+    const d=await apiGetDraft(activeTeamId);
+    const el=document.getElementById('draftContent');
+    // only update if we didn't make the last change
+    if(d.updated_by&&d.updated_by!==window.currentUser?.id&&d.content!==_draftContent){
+      const pos=el.selectionStart;
+      el.value=d.content; _draftContent=d.content;
+      el.setSelectionRange(pos,pos);
+      updateDraftStatus(d.updated_at,true);
+    }
+  }catch(e){}
+}
+
+async function saveDraft() {
+  if(!activeTeamId||!draftDirty) return;
+  const content=document.getElementById('draftContent').value;
+  try{
+    await apiSaveDraft(activeTeamId,content);
+    _draftContent=content; draftDirty=false;
+    updateDraftStatus(new Date().toISOString());
+  }catch(e){document.getElementById('draftStatus').textContent='save failed';}
+}
+
+function updateDraftStatus(ts,fromPartner=false){
+  if(!ts){document.getElementById('draftStatus').textContent='—';return;}
+  const t=fmtTime(ts);
+  document.getElementById('draftStatus').textContent=fromPartner?`partner updated · ${t}`:`saved · ${t}`;
+}
+
+document.getElementById('draftContent').addEventListener('input',()=>{
+  draftDirty=true;
+  document.getElementById('draftStatus').textContent='unsaved...';
+});
+// autosave every 5s
+setInterval(saveDraft,5000);
+
+// ── nav ────────────────────────────────────────────────
+function updateNav(){
+  const u=window.currentUser;
+  document.getElementById('signinBtn').classList.toggle('hidden',!!u);
+  document.getElementById('signoutBtn').classList.toggle('hidden',!u);
+  document.getElementById('postBtn').classList.toggle('hidden',!u);
+  document.getElementById('bellWrap').classList.toggle('hidden',!u);
+  document.getElementById('teamsBtn').classList.toggle('hidden',!u);
+  document.getElementById('adminBtn').classList.toggle('hidden',!u?.isAdmin);
+  document.getElementById('userEmail').classList.toggle('hidden',!u);
+  if(u) document.getElementById('userEmail').textContent=u.email;
+}
+
+window.handleSignOut=()=>{
+  apiSignOut(); window.currentUser=null; myInvites=[];
+  if(pollInterval) clearInterval(pollInterval);
+  if(draftInterval) clearInterval(draftInterval);
+  updateNav(); render(); showPage('home'); toast('Signed out');
+};
+
+// ── auth modal ─────────────────────────────────────────
+window.openAuthModal=(mode='signin')=>{authMode=mode;isForgot=false;updateAuthModal();document.getElementById('authOverlay').classList.add('open')};
+window.closeAuthModal=()=>document.getElementById('authOverlay').classList.remove('open');
+window.toggleAuthMode=()=>{authMode=authMode==='signin'?'signup':'signin';isForgot=false;updateAuthModal()};
+window.showForgot=()=>{isForgot=true;updateAuthModal()};
+
+function updateAuthModal(){
+  document.getElementById('authError').classList.add('hidden');
+  document.getElementById('authOk').classList.add('hidden');
+  if(isForgot){
+    document.getElementById('authTitle').textContent='Forgot password';
+    document.getElementById('authSub').textContent='Enter your email to receive a reset link';
+    document.getElementById('authPwField').classList.add('hidden');
+    document.getElementById('forgotLink').classList.add('hidden');
+    document.getElementById('authToggleBtn').textContent='Back to sign in';
+    document.getElementById('authSubmitBtn').textContent='SEND RESET LINK →';
+    return;
+  }
+  const s=authMode==='signin';
+  document.getElementById('authTitle').textContent=s?'Sign in':'Create account';
+  document.getElementById('authSub').textContent=s?'Welcome back to Mesh':'Join Mesh and find your team';
+  document.getElementById('authPwField').classList.remove('hidden');
+  document.getElementById('forgotLink').classList.toggle('hidden',!s);
+  document.getElementById('authToggleBtn').textContent=s?'Create account':'Sign in instead';
+  document.getElementById('authSubmitBtn').textContent=s?'SIGN IN →':'CREATE ACCOUNT →';
+}
+
+window.handleAuth=async()=>{
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  const errEl=document.getElementById('authError');
+  const okEl=document.getElementById('authOk');
+  const btn=document.getElementById('authSubmitBtn');
+  errEl.classList.add('hidden'); okEl.classList.add('hidden'); btn.disabled=true;
+
+  if(isForgot){
+    btn.textContent='SENDING...';
+    try{await apiForgotPassword(email);okEl.textContent='Reset link sent — check your email.';okEl.classList.remove('hidden');}
+    catch(e){errEl.textContent=e.message;errEl.classList.remove('hidden');}
+    finally{btn.disabled=false;btn.textContent='SEND RESET LINK →';}
+    return;
+  }
+
+  btn.textContent=authMode==='signin'?'SIGNING IN...':'CREATING...';
+  try{
+    window.currentUser=authMode==='signin'?await apiSignIn(email,password):await apiSignUp(email,password);
+    updateNav(); closeAuthModal();
+
+    loadBell(); render(); toast(authMode==='signin'?'Welcome back!':'Account created!');
+  }catch(e){errEl.textContent=e.message;errEl.classList.remove('hidden');}
+  finally{btn.disabled=false;updateAuthModal();}
+};
+
+// ── post modal ─────────────────────────────────────────
+window.openPostModal=()=>{if(!window.currentUser){openAuthModal('signin');return}document.getElementById('postOverlay').classList.add('open')};
+window.closePostModal=()=>document.getElementById('postOverlay').classList.remove('open');
+window.tog=(btn,s)=>{btn.classList.toggle('on');selSkills=btn.classList.contains('on')?[...selSkills,s]:selSkills.filter(x=>x!==s)};
+window.togL=(btn,s)=>{btn.classList.toggle('on');selLooking=btn.classList.contains('on')?[...selLooking,s]:selLooking.filter(x=>x!==s)};
+
+// ── avatar handler ─────────────────────────────────────
+window.handleAvatarChange=(prefix,input)=>{
+  const file=input.files[0];
+  if(!file) return;
+  if(file.size>800000){toast('Image too large. Max 750KB.',true);return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const b64=e.target.result;
+    if(prefix==='p'){pAvatarBase64=b64;}
+    else{eAvatarBase64=b64;}
+    const preview=document.getElementById(prefix+'AvatarPreview');
+    preview.innerHTML=`<img src="${b64}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`;
+  };
+  reader.readAsDataURL(file);
+};
+
+window.submitProfile=async()=>{
+  const name=document.getElementById('pName').value.trim(),role=document.getElementById('pRole').value.trim(),track=document.getElementById('pTrack').value,tz=document.getElementById('pTz').value,bio=document.getElementById('pBio').value.trim();
+  const github=document.getElementById('pGithub').value.trim(),twitter=document.getElementById('pTwitter').value.trim(),website=document.getElementById('pWebsite').value.trim();
+  const errEl=document.getElementById('postError'),btn=document.getElementById('postSubmitBtn');
+  errEl.classList.add('hidden');
+  if(!name||!role||!track||!tz||!bio){errEl.textContent='Fill in all required fields';errEl.classList.remove('hidden');return}
+  if(!selSkills.length){errEl.textContent='Select at least one skill';errEl.classList.remove('hidden');return}
+  btn.disabled=true;btn.textContent='POSTING...';
+  try{
+    let avatarUrl=null;
+    if(pAvatarBase64){
+      btn.textContent='UPLOADING PHOTO...';
+      try{ avatarUrl=await apiUploadAvatar(pAvatarBase64); }
+      catch(e){ toast('Photo upload failed — profile posted without photo',true); }
+    }
+    const p=await apiPostProfile({name,role,track,timezone:tz,bio,skills:[...selSkills],lookingFor:selLooking.length?[...selLooking]:['Developer'],avatarUrl,github:github||null,twitter:twitter||null,website:website||null});
+    allProfiles.unshift(p);document.getElementById('sBuilders').textContent=allProfiles.length;
+    closePostModal();render();toast(`Welcome to Mesh, ${name.split(' ')[0]}.`);
+    ['pName','pRole','pBio','pGithub','pTwitter','pWebsite'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('pTrack').value='';document.getElementById('pTz').value='';
+    document.getElementById('pAvatarPreview').innerHTML='<span id="pAvatarInitials">?</span>';
+    pAvatarBase64=null;
+    selSkills=[];selLooking=[];document.querySelectorAll('#skillPicker .pick-btn,#lookPicker .pick-btn').forEach(b=>b.classList.remove('on'));
+  }catch(e){errEl.textContent=e.message;errEl.classList.remove('hidden');}
+  finally{btn.disabled=false;btn.textContent='POST TO MESH →';}
+};
+
+// ── edit modal ─────────────────────────────────────────
+window.openEditModal=id=>{
+  const p=allProfiles.find(x=>x.id===id);if(!p) return;
+  editingProfileId=id;editSkills=[...p.skills];editLooking=[...p.looking_for];
+  eAvatarBase64=null;
+  document.getElementById('eName').value=p.name;document.getElementById('eRole').value=p.role;
+  document.getElementById('eTrack').value=p.track;document.getElementById('eTz').value=p.timezone;
+  document.getElementById('eBio').value=p.bio;
+  document.getElementById('eGithub').value=p.github||'';
+  document.getElementById('eTwitter').value=p.twitter||'';
+  document.getElementById('eWebsite').value=p.website||'';
+  // show current avatar
+  const preview=document.getElementById('eAvatarPreview');
+  preview.innerHTML=p.avatar_url
+    ?`<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`
+    :`<span>${ini(p.name)}</span>`;
+  document.querySelectorAll('#editSkillPicker .pick-btn').forEach(b=>b.classList.toggle('on',editSkills.includes(b.textContent.trim())));
+  document.querySelectorAll('#editLookPicker .pick-btn').forEach(b=>b.classList.toggle('on',editLooking.includes(b.textContent.trim())));
+  document.getElementById('editError').classList.add('hidden');
+  document.getElementById('editOverlay').classList.add('open');
+};
+window.closeEditModal=()=>document.getElementById('editOverlay').classList.remove('open');
+window.togE=(btn,s)=>{btn.classList.toggle('on');editSkills=btn.classList.contains('on')?[...editSkills,s]:editSkills.filter(x=>x!==s)};
+window.togEL=(btn,s)=>{btn.classList.toggle('on');editLooking=btn.classList.contains('on')?[...editLooking,s]:editLooking.filter(x=>x!==s)};
+
+window.submitEdit=async()=>{
+  const name=document.getElementById('eName').value.trim(),role=document.getElementById('eRole').value.trim(),track=document.getElementById('eTrack').value,tz=document.getElementById('eTz').value,bio=document.getElementById('eBio').value.trim();
+  const github=document.getElementById('eGithub').value.trim(),twitter=document.getElementById('eTwitter').value.trim(),website=document.getElementById('eWebsite').value.trim();
+  const errEl=document.getElementById('editError'),btn=document.getElementById('editSubmitBtn');
+  errEl.classList.add('hidden');
+  if(!name||!role||!track||!tz||!bio){errEl.textContent='Fill in all required fields';errEl.classList.remove('hidden');return}
+  btn.disabled=true;btn.textContent='SAVING...';
+  try{
+    let avatarUrl=allProfiles.find(p=>p.id===editingProfileId)?.avatar_url||null;
+    if(eAvatarBase64){
+      btn.textContent='UPLOADING PHOTO...';
+      try{ avatarUrl=await apiUploadAvatar(eAvatarBase64); }
+      catch(e){ toast('Photo upload failed — other changes saved',true); }
+    }
+    const updated=await apiEditProfile(editingProfileId,{name,role,track,timezone:tz,bio,skills:editSkills,lookingFor:editLooking,avatarUrl,github:github||null,twitter:twitter||null,website:website||null});
+    const idx=allProfiles.findIndex(p=>p.id===editingProfileId);if(idx>=0)allProfiles[idx]=updated;
+    eAvatarBase64=null;
+    closeEditModal();render();toast('Profile updated!');
+  }catch(e){errEl.textContent=e.message;errEl.classList.remove('hidden');}
+  finally{btn.disabled=false;btn.textContent='SAVE CHANGES →';}
+};
+
+// ── overlay close ──────────────────────────────────────
+['authOverlay','postOverlay','editOverlay'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open')});
+});
+
+// ── MESSAGE CONTEXT MENU ───────────────────────────────
+let _ctxMenu = null;
+function closeContextMenu(){ if(_ctxMenu){ _ctxMenu.remove(); _ctxMenu=null; } }
+document.addEventListener('click', closeContextMenu);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeContextMenu(); });
+
+window.showMsgContextMenu = function(e, msgId, msgBody, isMine, isAdmin, groupId) {
+  e.preventDefault(); e.stopPropagation();
+  closeContextMenu();
+  if(!isMine && !isAdmin) return;
+  const menu = document.createElement('div');
+  menu.className = 'msg-context-menu';
+  menu.style.left = Math.min(e.clientX, window.innerWidth-180)+'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight-120)+'px';
+  let html='';
+  if(isMine) html+=`<div class="msg-context-item" onclick="window.startEditMsg('${msgId}','${msgBody.replace(/'/g,'&#39;').replace(/"/g,'&quot;')}','${groupId}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit message</div>`;
+  if(isMine||isAdmin) html+=`<div class="msg-context-item danger" onclick="window.deleteGroupMsg('${groupId}','${msgId}',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg> Delete message</div>`;
+  menu.innerHTML=html;
+  document.body.appendChild(menu); _ctxMenu=menu;
+  menu.addEventListener('click', e=>e.stopPropagation());
+};
+
+window.startEditMsg = function(msgId, currentBody, groupId) {
+  closeContextMenu();
+  const bubble = document.querySelector(`[data-msg-id="${msgId}"] .msg-bubble`);
+  if(!bubble) return;
+  const orig = bubble.innerHTML;
+  bubble.innerHTML = `<input class="msg-edit-input" id="editInput_${msgId}" value="${esc(currentBody)}" maxlength="2000"><div class="msg-edit-actions"><button class="msg-edit-save" onclick="window.saveEditMsg('${msgId}','${groupId}',this)">SAVE</button><button class="msg-edit-cancel" onclick="this.closest('.msg-bubble').innerHTML='${orig.replace(/'/g,"&#39;").replace(/\n/g,'')}'">CANCEL</button></div>`;
+  const input=document.getElementById(`editInput_${msgId}`);
+  if(input){ input.focus(); input.setSelectionRange(input.value.length,input.value.length); }
+};
+
+window.saveEditMsg = async function(msgId, groupId, btn) {
+  const input=document.getElementById(`editInput_${msgId}`);
+  const newBody=input?.value?.trim();
+  if(!newBody) return;
+  btn.disabled=true; btn.textContent='SAVING...';
+  try {
+    const token=localStorage.getItem('sq_token');
+    const res=await fetch(`/api/groups?id=${groupId}&editMsg=${msgId}`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({body:newBody})});
+    const data=await res.json();
+    if(!data.ok) throw new Error(data.error);
+    const bubble=document.querySelector(`[data-msg-id="${msgId}"] .msg-bubble`);
+    if(bubble) bubble.innerHTML=escHtml(newBody);
+  } catch(e){ toast(e.message,true); btn.disabled=false; btn.textContent='SAVE'; }
+};
+
+window.deleteGroupMsg = async function(groupId, msgId, btn) {
+  closeContextMenu();
+  try {
+    await apiDeleteGroupMessage(groupId, msgId);
+    const bubble=document.querySelector(`[data-msg-id="${msgId}"] .msg-bubble`);
+    if(bubble) bubble.innerHTML='<span class="msg-deleted">🚫 Message deleted</span>';
+  } catch(e){ toast(e.message,true); }
+};
+
+// ── DIRECT MESSAGE CONTEXT ─────────────────────────────
+window.showDirectMsgContext = function(e, msgId, msgBody) {
+  e.preventDefault(); e.stopPropagation();
+  closeContextMenu();
+  const menu=document.createElement('div');
+  menu.className='msg-context-menu';
+  menu.style.left=Math.min(e.clientX,window.innerWidth-180)+'px';
+  menu.style.top=Math.min(e.clientY,window.innerHeight-120)+'px';
+  menu.innerHTML=`<div class="msg-context-item" onclick="window.startDirectEditMsg('${msgId}','${msgBody.replace(/'/g,'&#39;').replace(/"/g,'&quot;')}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit message</div>`;
+  document.body.appendChild(menu); _ctxMenu=menu;
+  menu.addEventListener('click',e=>e.stopPropagation());
+};
+
+window.startDirectEditMsg = function(msgId, currentBody) {
+  closeContextMenu();
+  const bubble=document.querySelector(`[data-msg-id="${msgId}"] .msg-bubble`);
+  if(!bubble) return;
+  const orig=bubble.innerHTML;
+  bubble.innerHTML=`<input class="msg-edit-input" id="editInput_${msgId}" value="${esc(currentBody)}" maxlength="2000"><div class="msg-edit-actions"><button class="msg-edit-save" onclick="window.saveDirectEditMsg('${msgId}',this)">SAVE</button><button class="msg-edit-cancel" onclick="this.closest('.msg-bubble').innerHTML='${orig.replace(/'/g,"&#39;").replace(/\n/g,'')}' ">CANCEL</button></div>`;
+  const input=document.getElementById(`editInput_${msgId}`);
+  if(input){ input.focus(); input.setSelectionRange(input.value.length,input.value.length); }
+};
+
+window.saveDirectEditMsg = async function(msgId, btn) {
+  const input=document.getElementById(`editInput_${msgId}`);
+  const newBody=input?.value?.trim();
+  if(!newBody) return;
+  btn.disabled=true; btn.textContent='SAVING...';
+  try {
+    const token=localStorage.getItem('sq_token');
+    const res=await fetch(`/api/messages?editMsg=${msgId}&teamId=${activeTeamId}`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({body:newBody})});
+    const data=await res.json();
+    if(!data.ok) throw new Error(data.error);
+    const bubble=document.querySelector(`[data-msg-id="${msgId}"] .msg-bubble`);
+    if(bubble) bubble.innerHTML=escHtml(newBody);
+  } catch(e){ toast(e.message,true); btn.disabled=false; btn.textContent='SAVE'; }
+};
+
+// ── LIGHTBOX ───────────────────────────────────────────
+window.openLightbox = function(url) {
+  const lb = document.createElement('div');
+  lb.className = 'lightbox';
+  lb.innerHTML = '<button class="lightbox-close" onclick="this.parentNode.remove()">✕</button><img src="'+url+'" alt="Image">';
+  lb.addEventListener('click', e=>{ if(e.target===lb) lb.remove(); });
+  document.body.appendChild(lb);
+};
+
+// ── toast ──────────────────────────────────────────────
+window.toast=(msg,isErr=false)=>{const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(isErr?' err':'');setTimeout(()=>t.className='toast',3200)};
+
+// ── check if coming from reset password redirect ──────
+if(new URLSearchParams(window.location.search).get('signin')==='1'){
+  history.replaceState({},'','/');
+  setTimeout(()=>openAuthModal('signin'),300);
+}
+
+// ── init ───────────────────────────────────────────────
+updateNav();
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesh — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#080809;--bg2:#0f0f11;--bg3:#161619;--bg4:#1e1e22;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--white:#f4f2ee;--muted:#7a7870;--faint:#3a3835;--accent:#E8C547;--accent2:#D4B03A;--accent-dim:rgba(232,197,71,0.1);--teal:#36c9b0;--red:#f05050;--blue:#5b9cf6;--r:4px;--r2:8px}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+  body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px)}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;background:rgba(8,8,9,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem}
+  .logo{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;color:var(--white);display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo-mark{display:flex;align-items:center;justify-content:center;}
+  .logo span{color:var(--accent)}
+  .admin-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border-radius:3px;background:rgba(240,80,80,0.1);border:1px solid rgba(240,80,80,0.25);color:var(--red)}
+  .nav-right{display:flex;align-items:center;gap:8px}
+  .btn-sm{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:6px 14px;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;text-decoration:none;transition:all .12s}
+  .btn-sm:hover{color:var(--white);border-color:var(--border2)}
+
+  /* LAYOUT */
+  .layout{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 52px)}
+
+  /* SIDEBAR */
+  .sidebar{border-right:1px solid var(--border);padding:1.25rem 0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;background:var(--bg2)}
+  .sidebar-label{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--faint);padding:0 1rem;margin-bottom:6px;margin-top:1.25rem}
+  .sidebar-label:first-child{margin-top:0}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:8px 1rem;font-size:13px;color:var(--muted);cursor:pointer;transition:all .1s;border-left:2px solid transparent;text-decoration:none}
+  .nav-item:hover{color:var(--white);background:var(--bg3)}
+  .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-dim)}
+  .nav-item svg{flex-shrink:0;opacity:.6}
+  .nav-item.active svg{opacity:1}
+
+  /* CONTENT */
+  .content{padding:2rem;overflow-x:hidden}
+  .page-title{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px}
+  .page-sub{font-size:13px;color:var(--muted);margin-bottom:2rem}
+
+  /* STAT CARDS */
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:2rem}
+  .stat-card{background:var(--bg2);padding:1.25rem;transition:background .12s}
+  .stat-card:hover{background:var(--bg3)}
+  .stat-num{font-family:'IBM Plex Mono',monospace;font-size:2rem;font-weight:600;color:var(--accent);line-height:1;margin-bottom:4px}
+  .stat-label{font-size:11px;color:var(--muted);letter-spacing:0.04em}
+  .stat-card.danger .stat-num{color:var(--red)}
+  .stat-card.teal .stat-num{color:var(--teal)}
+  .stat-card.blue .stat-num{color:var(--blue)}
+
+  /* TABLES */
+  .table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+  .table-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .table-title{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--faint)}
+  .search-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:5px 10px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:12px;outline:none;width:220px;transition:border-color .12s}
+  .search-box:focus{border-color:rgba(232,197,71,0.3)}
+  .search-box::placeholder{color:var(--faint)}
+  table{width:100%;border-collapse:collapse}
+  th{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint);padding:10px 1.25rem;text-align:left;border-bottom:1px solid var(--border);background:var(--bg3)}
+  td{padding:10px 1.25rem;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:var(--bg3);color:var(--white)}
+  .td-name{color:var(--white);font-weight:500}
+  .td-email{font-family:'IBM Plex Mono',monospace;font-size:11px}
+  .td-date{font-family:'IBM Plex Mono',monospace;font-size:11px;white-space:nowrap}
+
+  /* BADGES */
+  .badge{display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px}
+  .badge-admin{background:rgba(232,197,71,0.1);color:var(--accent);border:1px solid rgba(232,197,71,0.2)}
+  .badge-banned{background:rgba(240,80,80,0.1);color:var(--red);border:1px solid rgba(240,80,80,0.2)}
+  .badge-active{background:rgba(54,201,176,0.1);color:var(--teal);border:1px solid rgba(54,201,176,0.2)}
+
+  /* AVATAR */
+  .t-avi{width:30px;height:30px;border-radius:5px;object-fit:cover;flex-shrink:0}
+  .t-avi-placeholder{width:30px;height:30px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;flex-shrink:0}
+  .td-user{display:flex;align-items:center;gap:8px}
+
+  /* ACTION BUTTONS */
+  .act-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;padding:3px 8px;border-radius:3px;cursor:pointer;border:1px solid;transition:all .12s;background:transparent;white-space:nowrap}
+  .act-btn.ban{color:var(--red);border-color:rgba(240,80,80,0.25)}
+  .act-btn.ban:hover{background:rgba(240,80,80,0.08)}
+  .act-btn.unban{color:var(--teal);border-color:rgba(54,201,176,0.25)}
+  .act-btn.unban:hover{background:rgba(54,201,176,0.08)}
+  .act-btn.del{color:var(--red);border-color:rgba(240,80,80,0.25)}
+  .act-btn.del:hover{background:rgba(240,80,80,0.08)}
+  .act-btn.admin{color:var(--accent);border-color:rgba(232,197,71,0.25)}
+  .act-btn.admin:hover{background:var(--accent-dim)}
+  .act-btn.dissolve{color:var(--red);border-color:rgba(240,80,80,0.25)}
+  .act-btn.dissolve:hover{background:rgba(240,80,80,0.08)}
+  .act-btn:disabled{opacity:.4;cursor:not-allowed}
+  .acts{display:flex;gap:4px;flex-wrap:wrap}
+
+  /* MSG PREVIEW */
+  .msg-preview{max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+  .msg-type{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid var(--border);color:var(--faint)}
+
+  /* LOADING */
+  .loading{display:flex;align-items:center;justify-content:center;padding:4rem;color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:12px;gap:8px}
+  .spinner{width:16px;height:16px;border:2px solid var(--faint);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* EMPTY */
+  .empty{padding:3rem;text-align:center;color:var(--faint);font-size:13px}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:1.25rem;right:1.25rem;z-index:300;background:var(--bg3);border:1px solid rgba(54,201,176,0.25);border-radius:var(--r);padding:9px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);opacity:0;transform:translateY(8px);transition:all .18s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.err{border-color:rgba(240,80,80,0.3);color:var(--red)}
+
+  @media(max-width:740px){.layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;display:flex;flex-wrap:wrap;padding:.5rem;gap:4px;border-right:none;border-bottom:1px solid var(--border)}.nav-item{border-left:none;border-radius:4px;padding:6px 10px;font-size:12px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/app" class="logo">
+    <div class="logo-mark">
+      <img src="logo.png" width="22" height="22" style="object-fit:contain;" alt="Rialo logo">
+    </div>
+    MES<span>H</span>
+  </a>
+  <span class="admin-badge">ADMIN</span>
+  <div class="nav-right">
+    <a href="/app" class="btn-sm">← Back to app</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-label">Overview</div>
+    <div class="nav-item active" onclick="loadSection('stats',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>
+      Stats
+    </div>
+
+    <div class="sidebar-label">Manage</div>
+    <div class="nav-item" onclick="loadSection('users',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Users
+    </div>
+    <div class="nav-item" onclick="loadSection('profiles',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Profiles
+    </div>
+    <div class="nav-item" onclick="loadSection('teams',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Teams
+    </div>
+    <div class="nav-item" onclick="loadSection('groups',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Groups
+    </div>
+    <div class="nav-item" onclick="loadSection('messages',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="13" y2="14"/></svg>
+      Messages
+    </div>
+  </aside>
+
+  <main class="content" id="content">
+    <div class="loading"><div class="spinner"></div> Loading...</div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const AVI=[{bg:'rgba(91,156,246,0.15)',color:'#7ab0f8'},{bg:'rgba(232,197,71,0.1)',color:'#D4B03A'},{bg:'rgba(54,201,176,0.12)',color:'#4ed4ba'},{bg:'rgba(167,139,250,0.12)',color:'#b89ffa'},{bg:'rgba(240,128,80,0.12)',color:'#f0a080'}];
+const ini=n=>(n||'??').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const aviColor=id=>{let h=0;for(let c of (id||''))h=(h*31+c.charCodeAt(0))&0xffffffff;return AVI[Math.abs(h)%AVI.length]};
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtDate=s=>{try{return new Date(s.includes('T')?s:s+' UTC').toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});}catch{return s||''}};
+const token=()=>localStorage.getItem('sq_token');
+let _searchTerm='', _currentSection='stats', _currentData=null;
+
+function toast(msg,isErr=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(isErr?' err':'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+async function api(path,opts={}){
+  const res=await fetch('/api/admin'+path,{
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token()},
+    ...opts,
+    body:opts.body?JSON.stringify(opts.body):undefined
+  });
+  const d=await res.json();
+  if(!d.ok) throw new Error(d.error);
+  return d;
+}
+
+function avatarEl(avatarUrl, name, size=30){
+  if(avatarUrl) return `<img class="t-avi" src="${esc(avatarUrl)}" style="width:${size}px;height:${size}px">`;
+  const av=aviColor(name);
+  return `<span class="t-avi-placeholder" style="width:${size}px;height:${size}px;background:${av.bg};color:${av.color}">${ini(name)}</span>`;
+}
+
+// ── SECTION LOADING ────────────────────────────────────
+function loadSection(section, el){
+  _currentSection=section; _searchTerm='';
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  render();
+}
+
+async function render(){
+  const c=document.getElementById('content');
+  c.innerHTML='<div class="loading"><div class="spinner"></div> Loading...</div>';
+  try {
+    const data = await api(`?section=${_currentSection}`);
+    _currentData = data;
+    switch(_currentSection){
+      case 'stats':    renderStats(data.stats); break;
+      case 'users':    renderUsers(data.users); break;
+      case 'profiles': renderProfiles(data.profiles); break;
+      case 'teams':    renderTeams(data.teams); break;
+      case 'groups':   renderGroups(data.groups); break;
+      case 'messages': renderMessages(data.messages); break;
+    }
+  } catch(e){
+    c.innerHTML=`<div class="empty">${e.message === 'Forbidden — admin only' ? '🔒 Admin access required.' : e.message}</div>`;
+  }
+}
+
+// ── STATS ──────────────────────────────────────────────
+function renderStats(s){
+  document.getElementById('content').innerHTML=`
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub">Platform overview</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num">${s.users}</div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card"><div class="stat-num">${s.profiles}</div><div class="stat-label">Profiles</div></div>
+      <div class="stat-card teal"><div class="stat-num">${s.teams}</div><div class="stat-label">Teams Formed</div></div>
+      <div class="stat-card blue"><div class="stat-num">${s.groups}</div><div class="stat-label">Groups</div></div>
+      <div class="stat-card"><div class="stat-num">${s.messages}</div><div class="stat-label">Messages Sent</div></div>
+      <div class="stat-card teal"><div class="stat-num">${s.recentSignups}</div><div class="stat-label">New (7 days)</div></div>
+      <div class="stat-card danger"><div class="stat-num">${s.banned}</div><div class="stat-label">Banned Users</div></div>
+      <div class="stat-card"><div class="stat-num">${s.admins}</div><div class="stat-label">Admins</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="table-wrap" style="cursor:pointer" onclick="loadSection('users',document.querySelectorAll('.nav-item')[1])">
+        <div class="table-header"><span class="table-title">Quick actions</span></div>
+        <div style="padding:1.25rem;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:13px;color:var(--muted);padding:8px;border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:background .1s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background=''" onclick="loadSection('users',document.querySelectorAll('.nav-item')[1])">👥 Manage Users →</div>
+          <div style="font-size:13px;color:var(--muted);padding:8px;border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:background .1s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background=''" onclick="loadSection('profiles',document.querySelectorAll('.nav-item')[2])">🪪 Manage Profiles →</div>
+          <div style="font-size:13px;color:var(--muted);padding:8px;border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:background .1s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background=''" onclick="loadSection('messages',document.querySelectorAll('.nav-item')[5])">💬 Review Messages →</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title">Platform health</span></div>
+        <div style="padding:1.25rem">
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted);font-size:13px">Profile coverage</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent)">${s.users>0?Math.round(s.profiles/s.users*100):0}%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted);font-size:13px">Team formation rate</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--teal)">${s.users>0?Math.round(s.teams/(s.users/2)*100):0}%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0"><span style="color:var(--muted);font-size:13px">Avg msgs per team</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--blue)">${s.teams>0?Math.round(s.messages/s.teams):0}</span></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── USERS ──────────────────────────────────────────────
+function renderUsers(users){
+  const filtered=users.filter(u=>!_searchTerm||u.email.toLowerCase().includes(_searchTerm)||((u.name||'').toLowerCase().includes(_searchTerm)));
+  document.getElementById('content').innerHTML=`
+    <div class="page-title">Users</div>
+    <div class="page-sub">${users.length} total accounts</div>
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">${filtered.length} users</span>
+        <input class="search-box" placeholder="Search email or name..." oninput="_searchTerm=this.value.toLowerCase();renderUsers(_currentData.users)" value="${esc(_searchTerm)}">
+      </div>
+      <table>
+        <thead><tr><th>User</th><th>Email</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${filtered.map(u=>`
+          <tr>
+            <td><div class="td-user">${avatarEl(u.avatar_url,u.name||u.email)}<span class="td-name">${esc(u.name||'No profile')}</span></div></td>
+            <td class="td-email">${esc(u.email)}</td>
+            <td class="td-date">${fmtDate(u.created_at)}</td>
+            <td>
+              ${u.is_admin?'<span class="badge badge-admin">Admin</span>':''}
+              ${u.is_banned?'<span class="badge badge-banned">Banned</span>':'<span class="badge badge-active">Active</span>'}
+            </td>
+            <td><div class="acts">
+              ${u.is_banned
+                ?`<button class="act-btn unban" onclick="adminAction('PUT','?action=unban&userId=${u.id}',null,'Unbanned ${esc(u.email)}',this)">Unban</button>`
+                :`<button class="act-btn ban" onclick="adminAction('PUT','?action=ban&userId=${u.id}',null,'Banned ${esc(u.email)}',this)">Ban</button>`}
+              ${u.is_admin
+                ?`<button class="act-btn" style="color:var(--muted);border-color:var(--border)" onclick="adminAction('PUT','?action=removeAdmin&userId=${u.id}',null,'Removed admin from ${esc(u.email)}',this)">Remove Admin</button>`
+                :`<button class="act-btn admin" onclick="adminAction('PUT','?action=makeAdmin&userId=${u.id}',null,'Made ${esc(u.email)} admin',this)">Make Admin</button>`}
+              <button class="act-btn del" onclick="confirmDelete('deleteUser','${u.id}','Delete user ${esc(u.email)}?',this)">Delete</button>
+            </div></td>
+          </tr>`).join('')||'<tr><td colspan="5" class="empty">No users found</td></tr>'}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── PROFILES ───────────────────────────────────────────
+function renderProfiles(profiles){
+  const filtered=profiles.filter(p=>!_searchTerm||p.name.toLowerCase().includes(_searchTerm)||p.role.toLowerCase().includes(_searchTerm));
+  document.getElementById('content').innerHTML=`
+    <div class="page-title">Profiles</div>
+    <div class="page-sub">${profiles.length} public profiles</div>
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">${filtered.length} profiles</span>
+        <input class="search-box" placeholder="Search name or role..." oninput="_searchTerm=this.value.toLowerCase();renderProfiles(_currentData.profiles)" value="${esc(_searchTerm)}">
+      </div>
+      <table>
+        <thead><tr><th>Builder</th><th>Role</th><th>Track</th><th>Timezone</th><th>Actions</th></tr></thead>
+        <tbody>${filtered.map(p=>`
+          <tr>
+            <td><div class="td-user">${avatarEl(p.avatar_url,p.name)}<div><span class="td-name">${esc(p.name)}</span><div style="font-size:11px;color:var(--faint)">${esc(p.email)}</div></div></div></td>
+            <td>${esc(p.role)}</td>
+            <td><span class="badge" style="background:rgba(91,156,246,0.1);color:#7ab0f8;border-color:rgba(91,156,246,0.15)">${esc(p.track)}</span></td>
+            <td style="font-size:12px">${esc((p.timezone||'').replace('Europe / Africa','EU/AF').replace('Asia / Pacific','AS/PAC'))}</td>
+            <td><div class="acts">
+              <a href="/profile.html?id=${p.id}" target="_blank" class="act-btn" style="color:var(--accent);border-color:rgba(232,197,71,0.25);text-decoration:none">View</a>
+              <button class="act-btn del" onclick="confirmDelete('deleteProfile','${p.id}','Delete profile of ${esc(p.name)}?',this)">Delete</button>
+            </div></td>
+          </tr>`).join('')||'<tr><td colspan="5" class="empty">No profiles found</td></tr>'}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── TEAMS ──────────────────────────────────────────────
+function renderTeams(teams){
+  document.getElementById('content').innerHTML=`
+    <div class="page-title">Teams</div>
+    <div class="page-sub">${teams.length} teams formed</div>
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">${teams.length} teams</span></div>
+      <table>
+        <thead><tr><th>Member 1</th><th>Member 2</th><th>Messages</th><th>Formed</th><th>Actions</th></tr></thead>
+        <tbody>${teams.map(t=>`
+          <tr>
+            <td><div class="td-user">${avatarEl(t.user1_avatar,t.user1_name||'?')}<span class="td-name">${esc(t.user1_name||'Unknown')}</span></div></td>
+            <td><div class="td-user">${avatarEl(t.user2_avatar,t.user2_name||'?')}<span class="td-name">${esc(t.user2_name||'Unknown')}</span></div></td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${t.msg_count||0}</td>
+            <td class="td-date">${fmtDate(t.created_at)}</td>
+            <td><button class="act-btn dissolve" onclick="confirmDelete('dissolveTeam','${t.id}','Dissolve this team?',this)">Dissolve</button></td>
+          </tr>`).join('')||'<tr><td colspan="5" class="empty">No teams yet</td></tr>'}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── GROUPS ─────────────────────────────────────────────
+function renderGroups(groups){
+  document.getElementById('content').innerHTML=`
+    <div class="page-title">Groups</div>
+    <div class="page-sub">${groups.length} groups</div>
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">${groups.length} groups</span></div>
+      <table>
+        <thead><tr><th>Group Name</th><th>Created By</th><th>Members</th><th>Messages</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>${groups.map(g=>`
+          <tr>
+            <td class="td-name">${esc(g.name)}</td>
+            <td>${esc(g.creator_name||'Unknown')}</td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${g.member_count||0}</td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${g.msg_count||0}</td>
+            <td class="td-date">${fmtDate(g.created_at)}</td>
+            <td><button class="act-btn dissolve" onclick="confirmDelete('dissolveGroup','${g.id}','Dissolve group "${esc(g.name)}"?',this)">Dissolve</button></td>
+          </tr>`).join('')||'<tr><td colspan="6" class="empty">No groups yet</td></tr>'}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── MESSAGES ───────────────────────────────────────────
+function renderMessages(messages){
+  const filtered=messages.filter(m=>!_searchTerm||(m.body||'').toLowerCase().includes(_searchTerm)||(m.from_name||'').toLowerCase().includes(_searchTerm));
+  document.getElementById('content').innerHTML=`
+    <div class="page-title">Messages</div>
+    <div class="page-sub">Recent 100 messages across direct and group chats</div>
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">${filtered.length} messages</span>
+        <input class="search-box" placeholder="Search content or sender..." oninput="_searchTerm=this.value.toLowerCase();renderMessages(_currentData.messages)" value="${esc(_searchTerm)}">
+      </div>
+      <table>
+        <thead><tr><th>From</th><th>To</th><th>Message</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>${filtered.map(m=>`
+          <tr>
+            <td class="td-name">${esc(m.from_name||'Unknown')}</td>
+            <td>${esc(m.to_name||'—')}</td>
+            <td><div class="msg-preview">${m.deleted?'<em style="color:var(--faint)">Deleted</em>':esc(m.body||'')}</div></td>
+            <td><span class="msg-type">${m.type==='group'?'Group':'Direct'}</span></td>
+            <td class="td-date">${fmtDate(m.created_at)}</td>
+            <td><button class="act-btn del" onclick="confirmDelete('deleteMessage','${m.id}','Delete this message?',this)" ${m.deleted?'disabled':''}>Delete</button></td>
+          </tr>`).join('')||'<tr><td colspan="6" class="empty">No messages found</td></tr>'}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── ACTIONS ────────────────────────────────────────────
+async function adminAction(method, path, body, successMsg, btn) {
+  if(btn) btn.disabled=true;
+  try {
+    await api(path, { method, body });
+    toast(successMsg);
+    setTimeout(render, 300);
+  } catch(e) {
+    toast(e.message, true);
+    if(btn) btn.disabled=false;
+  }
+}
+
+function confirmDelete(action, id, msg, btn) {
+  if(!confirm(msg)) return;
+  adminAction('DELETE', `?action=${action}&id=${id}`, null, 'Deleted successfully', btn);
+}
+
+// ── AUTH CHECK ─────────────────────────────────────────
+(async function init() {
+  const user = JSON.parse(localStorage.getItem('sq_user') || 'null');
+  if (!user) { window.location.href = '/app'; return; }
+  if (!user.isAdmin) {
+    // double check with API
+    try {
+      await api('?section=stats');
+    } catch(e) {
+      if(e.message.includes('admin') || e.message.includes('Forbidden')) {
+        document.getElementById('content').innerHTML = '<div class="empty" style="padding:4rem">🔒 Admin access required. Contact the platform owner to grant admin privileges.</div>';
+        return;
+      }
+    }
+  }
+  loadSection('stats', document.querySelector('.nav-item'));
+})();
+</script>
+</body>
+</html>

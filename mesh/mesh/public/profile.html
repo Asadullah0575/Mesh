@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesh — Builder Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#080809;--bg2:#0f0f11;--bg3:#161619;--bg4:#1e1e22;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--border3:rgba(255,255,255,0.16);--white:#f4f2ee;--muted:#7a7870;--faint:#3a3835;--accent:#E8C547;--accent2:#D4B03A;--accent-dim:rgba(232,197,71,0.1);--teal:#36c9b0;--r:4px;--r2:8px}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px)}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;background:rgba(8,8,9,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem}
+  .logo{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;letter-spacing:-0.01em;color:var(--white);display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo-mark{width:22px;height:22px;border:1.5px solid var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;background:var(--accent-dim)}
+  .logo-name span{color:var(--accent)}
+  .back-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.04em;color:var(--muted);background:transparent;border:1px solid var(--border2);border-radius:var(--r);padding:6px 14px;cursor:pointer;text-decoration:none;transition:all .12s;display:flex;align-items:center;gap:6px}
+  .back-btn:hover{color:var(--white);border-color:var(--border3)}
+
+  /* PAGE */
+  .page{max-width:860px;margin:0 auto;padding:3rem 1.75rem 6rem}
+
+  /* LOADING / ERROR */
+  .state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:12px}
+  .state p{color:var(--muted)}
+
+  /* PROFILE CARD */
+  .profile-hero{display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;padding-bottom:2.5rem;border-bottom:1px solid var(--border);margin-bottom:2.5rem}
+
+  .profile-avatar{width:110px;height:110px;border-radius:12px;flex-shrink:0;overflow:hidden;border:1px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:2.5rem}
+  .profile-avatar img{width:100%;height:100%;object-fit:cover}
+
+  .profile-meta{}
+  .profile-name{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:1.6rem;letter-spacing:-0.02em;color:var(--white);margin-bottom:4px;line-height:1.1}
+  .profile-role{font-size:14px;color:var(--muted);margin-bottom:12px}
+
+  .profile-badges{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .track-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+  .tz-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.05em;text-transform:uppercase;padding:3px 9px;border-radius:3px;border:1px solid var(--border);color:var(--faint)}
+  .online-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.05em;padding:3px 9px;border-radius:3px;background:rgba(54,201,176,0.08);border:1px solid rgba(54,201,176,0.18);color:var(--teal);display:flex;align-items:center;gap:5px}
+  .online-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--teal);box-shadow:0 0 5px var(--teal)}
+
+  .profile-social{display:flex;gap:8px;flex-wrap:wrap}
+  .social-link{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);transition:all .12s}
+  .social-link:hover{color:var(--white);border-color:var(--border2)}
+  .social-link svg{flex-shrink:0}
+
+  /* INVITE BTN */
+  .invite-wrap{margin-top:16px}
+  .invite-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.04em;padding:8px 20px;border-radius:var(--r);border:none;background:var(--accent);color:#0a0a0a;cursor:pointer;transition:all .12s;text-transform:uppercase}
+  .invite-btn:hover{background:var(--accent2)}
+  .invite-btn.sent{background:rgba(54,201,176,0.08);border:1px solid rgba(54,201,176,0.2);color:var(--teal);cursor:default}
+  .invite-btn:disabled{opacity:.5;cursor:not-allowed}
+  .signin-hint{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:8px}
+  .signin-hint a{color:var(--accent);text-decoration:none}
+  .signin-hint a:hover{text-decoration:underline}
+
+  /* SECTIONS */
+  .section{margin-bottom:2.5rem}
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--faint);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  .bio-text{font-size:14px;color:var(--white);line-height:1.75;font-weight:300}
+
+  .skills-wrap{display:flex;flex-wrap:wrap;gap:6px}
+  .skill-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;padding:4px 10px;border-radius:3px;letter-spacing:0.01em}
+  .tag-dev{background:rgba(91,156,246,0.1);color:#7ab0f8;border:1px solid rgba(91,156,246,0.15)}
+  .tag-sol{background:rgba(232,197,71,0.08);color:#D4B03A;border:1px solid rgba(232,197,71,0.12)}
+  .tag-design{background:rgba(167,139,250,0.1);color:#b89ffa;border:1px solid rgba(167,139,250,0.15)}
+  .tag-biz{background:rgba(54,201,176,0.1);color:#4ed4ba;border:1px solid rgba(54,201,176,0.15)}
+  .tag-ai{background:rgba(240,80,80,0.1);color:#f08080;border:1px solid rgba(240,80,80,0.15)}
+
+  .looking-wrap{display:flex;flex-wrap:wrap;gap:6px}
+  .looking-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 10px;border-radius:3px;border:1px solid var(--border2);color:var(--muted);background:var(--bg3)}
+
+  /* SIMILAR BUILDERS */
+  .similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+  .similar-card{background:var(--bg2);padding:1rem;cursor:pointer;transition:background .12s;text-decoration:none;display:block}
+  .similar-card:hover{background:var(--bg3)}
+  .similar-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .sim-avi{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex-shrink:0}
+  .sim-avi img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+  .sim-name{font-size:12px;font-weight:600;color:var(--white);margin-bottom:1px}
+  .sim-role{font-size:11px;color:var(--muted)}
+  .sim-tags{display:flex;flex-wrap:wrap;gap:4px}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:1.25rem;right:1.25rem;z-index:300;background:var(--bg3);border:1px solid rgba(54,201,176,0.25);border-radius:var(--r);padding:9px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);opacity:0;transform:translateY(8px);transition:all .18s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.err{border-color:rgba(240,80,80,0.3);color:#f08080}
+
+  @media(max-width:600px){
+    .profile-hero{grid-template-columns:1fr;gap:1.25rem}
+    .profile-avatar{width:80px;height:80px;font-size:1.8rem}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/app" class="logo">
+    <div class="logo-mark">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2h3.5v3.5H2V2zm4.5 0H10v3.5H6.5V2zM2 6.5h3.5V10H2V6.5zm4.5 0H10V10H6.5V6.5z" fill="#E8C547"/></svg>
+    </div>
+    <span class="logo-name">MES<span>H</span></span>
+  </a>
+  <a href="/app" class="back-btn">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to builders
+  </a>
+</nav>
+
+<div class="page" id="page">
+  <div class="state" id="loadingState">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    <p>Loading profile...</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SC={Rust:'dev',TypeScript:'dev',React:'dev',Go:'dev',Python:'dev',DevOps:'dev','Smart Contracts':'sol',Solana:'sol','DeFi Protocols':'sol',Anchor:'sol','UI/UX':'design',Figma:'design',Branding:'design',Product:'biz','Go-to-market':'biz',BD:'biz',Marketing:'biz','AI/ML':'ai',LLMs:'ai',Agents:'ai'};
+const TS={DeFi:'background:rgba(54,201,176,0.1);color:#4ed4ba;border:1px solid rgba(54,201,176,0.15)',Infrastructure:'background:rgba(91,156,246,0.1);color:#7ab0f8;border:1px solid rgba(91,156,246,0.15)',Consumer:'background:rgba(232,197,71,0.08);color:#D4B03A;border:1px solid rgba(232,197,71,0.12)',AI:'background:rgba(167,139,250,0.1);color:#b89ffa;border:1px solid rgba(167,139,250,0.15)',Gaming:'background:rgba(240,128,80,0.1);color:#f0a080;border:1px solid rgba(240,128,80,0.15)',Privacy:'background:rgba(255,255,255,0.05);color:#7a7870;border:1px solid rgba(255,255,255,0.08)'};
+const AVI=[{bg:'rgba(91,156,246,0.15)',color:'#7ab0f8'},{bg:'rgba(232,197,71,0.1)',color:'#D4B03A'},{bg:'rgba(54,201,176,0.12)',color:'#4ed4ba'},{bg:'rgba(167,139,250,0.12)',color:'#b89ffa'},{bg:'rgba(240,128,80,0.12)',color:'#f0a080'}];
+
+const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const aviColor=id=>{let h=0;for(let c of id)h=(h*31+c.charCodeAt(0))&0xffffffff;return AVI[Math.abs(h)%AVI.length]};
+const sc=s=>SC[s]||'biz';
+const ts=t=>TS[t]||'background:rgba(255,255,255,0.05);color:#7a7870;border:1px solid rgba(255,255,255,0.08)';
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function getCurrentUser(){try{return JSON.parse(localStorage.getItem('sq_user'));}catch{return null;}}
+function getToken(){return localStorage.getItem('sq_token');}
+
+function toast(msg,isErr=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(isErr?' err':'');
+  setTimeout(()=>t.className='toast',3200);
+}
+
+async function sendInvite(profileId,btn){
+  const token=getToken();
+  if(!token){window.location.href='/app';return;}
+  btn.disabled=true;btn.textContent='SENDING...';
+  try{
+    const res=await fetch('/api/invites',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({toProfileId:profileId})});
+    const data=await res.json();
+    if(!data.ok) throw new Error(data.error);
+    toast('Invite sent — they\'ll be notified by email');
+    btn.textContent='INVITE SENT';btn.classList.add('sent');
+  }catch(e){
+    toast(e.message,true);btn.disabled=false;btn.textContent='INVITE';
+  }
+}
+
+function renderProfile(p, allProfiles){
+  const av=aviColor(p.id);
+  const trackStyle=ts(p.track);
+  const tzShort=(p.timezone||'').replace('Europe / Africa','EU / Africa').replace('Asia / Pacific','Asia / Pacific');
+  const user=getCurrentUser();
+  const isOwn=user&&user.id===p.user_id;
+
+  // social links
+  const socials=[];
+  if(p.github) socials.push(`<a class="social-link" href="https://github.com/${esc(p.github)}" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>github.com/${esc(p.github)}</a>`);
+  if(p.twitter) socials.push(`<a class="social-link" href="https://twitter.com/${esc(p.twitter)}" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@${esc(p.twitter)}</a>`);
+  if(p.website) socials.push(`<a class="social-link" href="${esc(p.website.startsWith('http')?p.website:'https://'+p.website)}" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>${esc((p.website||'').replace(/^https?:\/\//,''))}</a>`);
+
+  // invite section
+  let inviteHTML='';
+  if(!isOwn){
+    if(user){
+      inviteHTML=`<div class="invite-wrap"><button class="invite-btn" id="invBtn" onclick="sendInvite('${p.id}',this)">INVITE TO TEAM →</button></div>`;
+    } else {
+      inviteHTML=`<div class="invite-wrap"><div class="signin-hint"><a href="/app">Sign in</a> to invite this builder</div></div>`;
+    }
+  }
+
+  // similar builders — same track, not same person
+  const similar=allProfiles.filter(x=>x.id!==p.id&&x.track===p.track).slice(0,4);
+  const similarHTML=similar.length?`
+    <div class="section">
+      <div class="section-label">More ${p.track} builders</div>
+      <div class="similar-grid">
+        ${similar.map(s=>{
+          const sav=aviColor(s.id);
+          const avatarEl=s.avatar_url?`<img src="${s.avatar_url}" style="width:34px;height:34px;border-radius:6px;object-fit:cover">`:`<div class="sim-avi" style="background:${sav.bg};color:${sav.color}">${ini(s.name)}</div>`;
+          return `<a class="similar-card" href="/profile.html?id=${s.id}">
+            <div class="similar-head">${avatarEl}<div><div class="sim-name">${esc(s.name)}</div><div class="sim-role">${esc(s.role)}</div></div></div>
+            <div class="sim-tags">${(s.skills||[]).slice(0,3).map(sk=>`<span class="skill-tag tag-${sc(sk)}" style="font-size:10px;padding:2px 6px">${esc(sk)}</span>`).join('')}</div>
+          </a>`;
+        }).join('')}
+      </div>
+    </div>`:'';
+
+  document.getElementById('page').innerHTML=`
+    <div class="profile-hero">
+      <div class="profile-avatar">
+        ${p.avatar_url?`<img src="${p.avatar_url}" alt="${esc(p.name)}">`:`<span style="color:${av.color};background:${av.bg};width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:12px">${ini(p.name)}</span>`}
+      </div>
+      <div class="profile-meta">
+        <div class="profile-name">${esc(p.name)}</div>
+        <div class="profile-role">${esc(p.role)}</div>
+        <div class="profile-badges">
+          <span class="track-badge" style="${ts(p.track)}">${esc(p.track||'').toUpperCase()}</span>
+          <span class="tz-badge">${esc(tzShort)}</span>
+          ${p.is_active?'<span class="online-badge">ONLINE</span>':''}
+        </div>
+        ${socials.length?`<div class="profile-social">${socials.join('')}</div>`:''}
+        ${inviteHTML}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">About</div>
+      <p class="bio-text">${esc(p.bio)}</p>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Skills</div>
+      <div class="skills-wrap">
+        ${(p.skills||[]).map(s=>`<span class="skill-tag tag-${sc(s)}">${esc(s)}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Looking for</div>
+      <div class="looking-wrap">
+        ${(p.looking_for||[]).map(r=>`<span class="looking-tag">${esc(r)}</span>`).join('')}
+      </div>
+    </div>
+
+    ${similarHTML}
+  `;
+
+  // update page title
+  document.title = `${p.name} — Mesh`;
+}
+
+async function load(){
+  const id=new URLSearchParams(window.location.search).get('id');
+  if(!id){
+    document.getElementById('page').innerHTML='<div class="state"><p>No profile ID provided.</p><a href="/app" style="color:var(--accent);font-family:monospace;font-size:11px">← Back to builders</a></div>';
+    return;
+  }
+  try{
+    const res=await fetch('/api/profiles');
+    const data=await res.json();
+    if(!data.ok) throw new Error(data.error);
+    const profile=data.profiles.find(p=>p.id===id);
+    if(!profile){
+      document.getElementById('page').innerHTML='<div class="state"><p>Builder not found.</p><a href="/app" style="color:var(--accent);font-family:monospace;font-size:11px">← Back to builders</a></div>';
+      return;
+    }
+    renderProfile(profile, data.profiles);
+  }catch(e){
+    document.getElementById('page').innerHTML=`<div class="state"><p>${e.message}</p><a href="/app" style="color:var(--accent);font-family:monospace;font-size:11px">← Back to builders</a></div>`;
+  }
+}
+
+load();
+</script>
+</body>
+</html>
