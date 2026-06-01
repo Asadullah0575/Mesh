@@ -2,7 +2,7 @@
 
 > **Find your founding team. Build something real.**
 
-Rialo is an open-source team-matching platform for builders, designers, and operators. Post your profile, filter by track, timezone, and role, and connect with the right people — for hackathons, startups, or any project.
+Mesh is an open-source team-matching platform for builders, designers, and operators. Post your profile, filter by track, timezone, and role, and connect with the right people — for hackathons, startups, or any project.
 
 ![Status](https://img.shields.io/badge/status-live-brightgreen?style=flat-square) ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square) ![Stack](https://img.shields.io/badge/stack-Turso%20%2B%20Vercel-4f46e5?style=flat-square)
 
@@ -34,7 +34,7 @@ Rialo is an open-source team-matching platform for builders, designers, and oper
 ## Project Structure
 
 ```
-rialo/
+Mesh/
 ├── api/
 │   ├── _lib.js        # Shared DB client, JWT, bcrypt helpers
 │   ├── auth.js        # POST /api/auth?action=signup|signin
@@ -57,8 +57,8 @@ rialo/
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/Asadullah0575/rialo.git
-cd rialo
+git clone https://github.com/Asadullah0575/mesh.git
+cd mesh
 ```
 
 ### 2. Install dependencies
@@ -77,11 +77,11 @@ curl -sSfL https://get.tur.so/install.sh | bash
 turso auth login
 
 # Create DB
-turso db create rialo
+turso db create mesh
 
 # Get your URL and token
-turso db show rialo --url
-turso db tokens create rialo
+turso db show mesh --url
+turso db tokens create mesh
 ```
 
 Or create a database from the [Turso dashboard](https://app.turso.tech).
@@ -91,7 +91,7 @@ Or create a database from the [Turso dashboard](https://app.turso.tech).
 Create a `.env` file (never commit this):
 
 ```env
-TURSO_DATABASE_URL=libsql://rialo-yourname.turso.io
+TURSO_DATABASE_URL=libsql://mesh-yourname.turso.io
 TURSO_AUTH_TOKEN=your-turso-token
 JWT_SECRET=a-long-random-secret-string-at-least-32-chars
 ```
@@ -137,7 +137,7 @@ git push
 ### Step 2 — Import on Vercel
 
 1. Go to [vercel.com/new](https://vercel.com/new)
-2. Import `Asadullah0575/rialo`
+2. Import `Asadullah0575/mesh`
 3. Framework preset: **Other**
 
 ### Step 3 — Add environment variables
@@ -146,19 +146,19 @@ In Vercel project settings → **Environment Variables**, add:
 
 | Key | Value |
 |-----|-------|
-| `TURSO_DATABASE_URL` | `libsql://rialo-yourname.turso.io` |
+| `TURSO_DATABASE_URL` | `libsql://mesh-yourname.turso.io` |
 | `TURSO_AUTH_TOKEN` | your Turso token |
 | `JWT_SECRET` | your random secret string |
 
 ### Step 4 — Deploy
 
-Click **Deploy**. Your app will be live at `https://rialo.vercel.app`.
+Click **Deploy**. Your app will be live at `https://mesh.vercel.app`.
 
 ### Step 5 — Init the database
 
 After deploy, visit once:
 ```
-https://rialo.vercel.app/api/init?secret=FIRST8CHARSOFYOURJWTSECRET
+https://mesh.vercel.app/api/init?secret=FIRST8CHARSOFYOURJWTSECRET
 ```
 
 ---
